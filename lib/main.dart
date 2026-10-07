@@ -9,7 +9,7 @@ class MiventApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF355C7D);
+    const primary = Color(0xFFD97757);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ميفنت',
@@ -18,12 +18,12 @@ class MiventApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: primary,
           primary: primary,
-          surface: const Color(0xFFF7F9FC),
+          surface: const Color(0xFFF7F4EF),
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F9FC),
+        scaffoldBackgroundColor: const Color(0xFFF7F4EF),
         fontFamily: 'Arial',
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF7F9FC),
+          backgroundColor: Color(0xFFF7F4EF),
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
@@ -102,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(
                   isBooked ? Icons.event_available : Icons.event_note,
                   color: isBooked
-                      ? const Color(0xFF2E8B72)
-                      : const Color(0xFF355C7D),
+                      ? const Color(0xFF6B8E72)
+                      : const Color(0xFFD97757),
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'مرحباً بك في ميفنت',
               style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF718096),
+                color: Color(0xFF78716C),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 23,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF1F2937),
+                color: Color(0xFF292524),
               ),
             ),
           ],
@@ -173,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.only(left: 18, right: 16),
             child: CircleAvatar(
               radius: 20,
-              backgroundColor: Color(0xFFDCE9F2),
-              child: Icon(Icons.person_outline, color: Color(0xFF355C7D)),
+              backgroundColor: Color(0xFFF3C5B5),
+              child: Icon(Icons.person_outline, color: Color(0xFFD97757)),
             ),
           ),
         ],
@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _selectedTab == 0
           ? FloatingActionButton.extended(
               onPressed: () => _showDayDetails(DateTime.now().day),
-              backgroundColor: const Color(0xFF355C7D),
+              backgroundColor: const Color(0xFFD97757),
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
               label: const Text(
@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedIndex: _selectedTab,
         onDestinationSelected: (index) => setState(() => _selectedTab = index),
         backgroundColor: Colors.white,
-        indicatorColor: const Color(0xFFDCE9F2),
+        indicatorColor: const Color(0xFFF3C5B5),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined),
@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF1F2937),
+                  color: Color(0xFF292524),
                 ),
               ),
               TextButton.icon(
@@ -330,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'اضغط على اليوم لعرض التفاصيل',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Color(0xFF8A98A8),
+                              color: Color(0xFF78716C),
                             ),
                           ),
                         ],
@@ -352,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF8A98A8),
+                                  color: Color(0xFF78716C),
                                 ),
                               ),
                             ),
@@ -384,9 +384,9 @@ class _HomeScreenState extends State<HomeScreen> {
             spacing: 18,
             runSpacing: 8,
             children: const [
-              _Legend(color: Color(0xFF2E8B72), label: 'محجوز'),
-              _Legend(color: Color(0xFFF0B35B), label: 'جزئي'),
-              _Legend(color: Color(0xFFE7EDF2), label: 'متاح'),
+              _Legend(color: Color(0xFF6B8E72), label: 'محجوز'),
+              _Legend(color: Color(0xFFD59A3A), label: 'جزئي'),
+              _Legend(color: Color(0xFFE7E2DC), label: 'متاح'),
             ],
           ),
         ],
@@ -404,10 +404,10 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 86,
             height: 86,
             decoration: BoxDecoration(
-              color: const Color(0xFFDCE9F2),
+              color: const Color(0xFFF3C5B5),
               borderRadius: BorderRadius.circular(28),
             ),
-            child: Icon(icon, size: 42, color: const Color(0xFF355C7D)),
+            child: Icon(icon, size: 42, color: const Color(0xFFD97757)),
           ),
           const SizedBox(height: 20),
           Text(
@@ -415,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
-          Text(subtitle, style: const TextStyle(color: Color(0xFF718096))),
+          Text(subtitle, style: const TextStyle(color: Color(0xFF78716C))),
           const SizedBox(height: 22),
           OutlinedButton.icon(
             onPressed: () {},
@@ -442,7 +442,7 @@ class _HeaderIcon extends StatelessWidget {
     children: [
       IconButton(
         onPressed: onTap,
-        icon: Icon(icon, size: 27, color: const Color(0xFF355C7D)),
+        icon: Icon(icon, size: 27, color: const Color(0xFFD97757)),
       ),
       Positioned(
         top: 5,
@@ -450,7 +450,7 @@ class _HeaderIcon extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(3),
           decoration: const BoxDecoration(
-            color: Color(0xFFE76F51),
+            color: Color(0xFFC65D5D),
             shape: BoxShape.circle,
           ),
           child: Text(
@@ -476,14 +476,14 @@ class _SummaryCard extends StatelessWidget {
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
       gradient: const LinearGradient(
-        colors: [Color(0xFF355C7D), Color(0xFF4E809E)],
+        colors: [Color(0xFFD97757), Color(0xFFB85C3E)],
         begin: Alignment.topRight,
         end: Alignment.bottomLeft,
       ),
       borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
-          color: const Color(0xFF355C7D).withValues(alpha: .2),
+          color: const Color(0xFFD97757).withValues(alpha: .2),
           blurRadius: 18,
           offset: const Offset(0, 8),
         ),
@@ -574,7 +574,7 @@ class _Legend extends StatelessWidget {
       const SizedBox(width: 6),
       Text(
         label,
-        style: const TextStyle(fontSize: 12, color: Color(0xFF718096)),
+        style: const TextStyle(fontSize: 12, color: Color(0xFF78716C)),
       ),
     ],
   );
@@ -594,21 +594,21 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = isBooked
-        ? const Color(0xFFE4F3EE)
+        ? const Color(0xFFF3C5B5)
         : isPartial
-        ? const Color(0xFFFFF3DF)
-        : const Color(0xFFF5F7FA);
+        ? const Color(0xFFF3C5B5)
+        : const Color(0xFFF7F4EF);
     final fg = isBooked
-        ? const Color(0xFF26745F)
+        ? const Color(0xFF6B8E72)
         : isPartial
-        ? const Color(0xFFB97818)
-        : const Color(0xFF536273);
+        ? const Color(0xFFD59A3A)
+        : const Color(0xFF64748B);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(13),
       child: Container(
         decoration: BoxDecoration(
-          color: isToday ? const Color(0xFF355C7D) : bg,
+          color: isToday ? const Color(0xFFD97757) : bg,
           borderRadius: BorderRadius.circular(13),
           border: isToday ? null : Border.all(color: Colors.transparent),
         ),
@@ -631,9 +631,9 @@ class _DayCell extends StatelessWidget {
                 color: isToday
                     ? Colors.white
                     : isBooked
-                    ? const Color(0xFF2E8B72)
+                    ? const Color(0xFF6B8E72)
                     : isPartial
-                    ? const Color(0xFFF0B35B)
+                    ? const Color(0xFFD59A3A)
                     : Colors.transparent,
                 shape: BoxShape.circle,
               ),
