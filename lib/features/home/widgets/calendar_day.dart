@@ -62,8 +62,9 @@ class CalendarDay extends StatelessWidget {
 
   _DayStatus _dayStatus() {
     if (bookings.isEmpty) return _DayStatus.available;
-    final hasConfirmed =
-        bookings.any((b) => b.status == BookingStatus.confirmed);
+    final hasConfirmed = bookings.any(
+      (b) => b.status == BookingStatus.confirmed,
+    );
     if (hasConfirmed) return _DayStatus.booked;
     final hasPartial = bookings.any((b) => b.status == BookingStatus.partial);
     if (hasPartial) return _DayStatus.partial;

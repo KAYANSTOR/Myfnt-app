@@ -5,8 +5,7 @@ import 'package:mivent/features/bookings/data/booking_repository.dart';
 import 'package:mivent/features/bookings/domain/booking.dart';
 
 /// ينشئ DB في الذاكرة — سريع ولا يترك أثراً على الجهاز
-AppDatabase _inMemoryDb() =>
-    AppDatabase(NativeDatabase.memory());
+AppDatabase _inMemoryDb() => AppDatabase(NativeDatabase.memory());
 
 void main() {
   late AppDatabase db;
@@ -76,9 +75,15 @@ void main() {
     test('إضافة أكثر من حجز ليوم واحد', () async {
       final date = DateTime(2026, 10, 15);
       await repo.addBooking(
-          customerName: 'عميل 1', date: date, status: BookingStatus.confirmed);
+        customerName: 'عميل 1',
+        date: date,
+        status: BookingStatus.confirmed,
+      );
       await repo.addBooking(
-          customerName: 'عميل 2', date: date, status: BookingStatus.partial);
+        customerName: 'عميل 2',
+        date: date,
+        status: BookingStatus.partial,
+      );
 
       final all = await db.bookingsDao.getAll();
       expect(all.length, 2);
@@ -98,15 +103,14 @@ void main() {
         status: BookingStatus.confirmed,
       );
 
-      final octBookings =
-          await repo.watchByMonth(2026, 10).first;
+      final octBookings = await repo.watchByMonth(2026, 10).first;
       expect(octBookings.length, 1);
       expect(octBookings.first.customerName, 'عميل أكتوبر');
     });
 
     test('watchByMonth يتحدث عند إضافة حجز جديد', () async {
       final stream = repo.watchByMonth(2026, 10);
-      
+
       // أول قيمة: فارغ
       final first = await stream.first;
       expect(first, isEmpty);
@@ -135,8 +139,7 @@ void main() {
         status: BookingStatus.confirmed,
       );
 
-      final day10 =
-          await repo.watchByDate(DateTime(2026, 10, 10)).first;
+      final day10 = await repo.watchByDate(DateTime(2026, 10, 10)).first;
       expect(day10.length, 1);
       expect(day10.first.customerName, 'عميل يوم 10');
     });

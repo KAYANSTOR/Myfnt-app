@@ -49,10 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       floatingActionButton: _selectedTab == 0
           ? FloatingActionButton.extended(
-              onPressed: () => showAddBookingSheet(
-                context,
-                DateTime.now(),
-              ),
+              onPressed: () => showAddBookingSheet(context, DateTime.now()),
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
@@ -169,12 +166,10 @@ class _PlaceholderTab extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               title,
-              style: const TextStyle(
-                  fontSize: 24, fontWeight: FontWeight.w800),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
-            Text(subtitle,
-                style: const TextStyle(color: AppColors.textMid)),
+            Text(subtitle, style: const TextStyle(color: AppColors.textMid)),
             const SizedBox(height: 22),
             OutlinedButton.icon(
               onPressed: () {},

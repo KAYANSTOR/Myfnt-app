@@ -9,8 +9,18 @@ class MonthNavigator extends ConsumerWidget {
   const MonthNavigator({super.key});
 
   static const _monthNames = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
   ];
 
   @override
@@ -31,10 +41,7 @@ class MonthNavigator extends ConsumerWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 2),
             const Text(

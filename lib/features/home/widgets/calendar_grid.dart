@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../bookings/domain/booking.dart';
 import '../../bookings/providers/booking_providers.dart';
 import 'calendar_day.dart';
 import 'month_navigator.dart';
@@ -85,12 +86,12 @@ class CalendarGrid extends ConsumerWidget {
     DateTime month,
     int day,
     DateTime now,
-    Map<DateTime, dynamic> bookingsMap,
+    Map<DateTime, List<Booking>> bookingsMap,
   ) {
     final date = DateTime(month.year, month.month, day);
     final isToday =
         date.year == now.year && date.month == now.month && date.day == now.day;
-    final dayBookings = bookingsMap[date] ?? const [];
+    final dayBookings = bookingsMap[date] ?? const <Booking>[];
 
     return CalendarDay(
       day: day,

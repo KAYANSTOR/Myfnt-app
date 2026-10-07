@@ -51,7 +51,9 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
     });
 
     try {
-      await ref.read(bookingControllerProvider).addBooking(
+      await ref
+          .read(bookingControllerProvider)
+          .addBooking(
             customerName: name,
             date: widget.date,
             status: _status,
@@ -62,9 +64,9 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ تم حفظ الحجز بنجاح')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('✅ تم حفظ الحجز بنجاح')));
       }
     } catch (e) {
       setState(() {
@@ -77,8 +79,18 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
   @override
   Widget build(BuildContext context) {
     final months = [
-      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
     ];
     final dateLabel =
         '${widget.date.day} ${months[widget.date.month - 1]} ${widget.date.year}';
@@ -96,10 +108,7 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
         children: [
           Text(
             'حجز جديد — $dateLabel',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-            ),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 20),
           TextField(
@@ -124,8 +133,10 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
             maxLines: 2,
           ),
           const SizedBox(height: 14),
-          const Text('حالة الحجز:',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text(
+            'حالة الحجز:',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 10,
@@ -143,22 +154,25 @@ class _AddBookingSheetState extends ConsumerState<AddBookingSheet> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 10),
-            Text(_error!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13)),
+            Text(
+              _error!,
+              style: const TextStyle(color: AppColors.error, fontSize: 13),
+            ),
           ],
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: _saving ? null : _save,
-              style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
               icon: _saving
                   ? const SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : const Icon(Icons.check),
               label: Text(_saving ? 'جاري الحفظ...' : 'حفظ الحجز'),

@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 
 import 'tables.dart';
 
@@ -19,10 +15,9 @@ class BookingsDao extends DatabaseAccessor<AppDatabase>
   // ── قراءة ──────────────────────────────────────────
 
   /// Stream تفاعلي لجميع الحجوزات — يتحدث تلقائياً عند أي تغيير
-  Stream<List<BookingsTableData>> watchAll() =>
-      (select(bookingsTable)
-            ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-          .watch();
+  Stream<List<BookingsTableData>> watchAll() => (select(
+    bookingsTable,
+  )..orderBy([(t) => OrderingTerm.desc(t.date)])).watch();
 
   /// Stream تفاعلي لحجوزات شهر محدد
   Stream<List<BookingsTableData>> watchByMonth(int year, int month) {
@@ -38,20 +33,18 @@ class BookingsDao extends DatabaseAccessor<AppDatabase>
   Stream<List<BookingsTableData>> watchByDate(DateTime date) {
     final start = DateTime(date.year, date.month, date.day);
     final end = start.add(const Duration(days: 1));
-    return (select(bookingsTable)
-          ..where((t) => t.date.isBetweenValues(start, end)))
-        .watch();
+    return (select(
+      bookingsTable,
+    )..where((t) => t.date.isBetweenValues(start, end))).watch();
   }
 
   /// قراءة مرة واحدة (للاختبارات)
-  Future<List<BookingsTableData>> getAll() =>
-      (select(bookingsTable)
-            ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-          .get();
+  Future<List<BookingsTableData>> getAll() => (select(
+    bookingsTable,
+  )..orderBy([(t) => OrderingTerm.desc(t.date)])).get();
 
   Future<BookingsTableData?> getById(int id) =>
-      (select(bookingsTable)..where((t) => t.id.equals(id)))
-          .getSingleOrNull();
+      (select(bookingsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   // ── كتابة ──────────────────────────────────────────
 
@@ -71,10 +64,9 @@ class CustomersDao extends DatabaseAccessor<AppDatabase>
     with _$CustomersDaoMixin {
   CustomersDao(super.db);
 
-  Stream<List<CustomersTableData>> watchAll() =>
-      (select(customersTable)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .watch();
+  Stream<List<CustomersTableData>> watchAll() => (select(
+    customersTable,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
 
   Future<int> insert(CustomersTableCompanion entry) =>
       into(customersTable).insert(entry);
@@ -93,11 +85,11 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) => m.createAll(),
-        onUpgrade: (m, from, to) async {
-          // Migrations مستقبلية تُضاف هنا
-        },
-      );
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // Migrations مستقبلية تُضاف هنا
+    },
+  );
 }
 
 /// فتح اتصال SQLite في خلفية Isolate منفصلة
@@ -105,8 +97,6 @@ class AppDatabase extends _$AppDatabase {
 QueryExecutor _openConnection() {
   return driftDatabase(
     name: 'mivent_db',
-    native: DriftNativeOptions(
-      shareAcrossIsolates: true,
-    ),
+    native: DriftNativeOptions(shareAcrossIsolates: true),
   );
 }

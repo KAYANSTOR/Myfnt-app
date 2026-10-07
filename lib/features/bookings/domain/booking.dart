@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 /// حالة الحجز
 enum BookingStatus {
   confirmed, // مؤكد
-  partial,   // جزئي (دفعة مقدمة فقط)
-  pending,   // قيد الانتظار
+  partial, // جزئي (دفعة مقدمة فقط)
+  pending, // قيد الانتظار
   cancelled, // ملغى
 }
 
@@ -77,9 +77,7 @@ class Booking {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Booking &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+      other is Booking && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;

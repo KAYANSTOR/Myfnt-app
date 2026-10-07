@@ -7,9 +7,7 @@ import 'features/home/presentation/home_screen.dart';
 void main() {
   runApp(
     // ProviderScope يُغلّف التطبيق كاملاً لتشغيل Riverpod
-    const ProviderScope(
-      child: MiventApp(),
-    ),
+    const ProviderScope(child: MiventApp()),
   );
 }
 
