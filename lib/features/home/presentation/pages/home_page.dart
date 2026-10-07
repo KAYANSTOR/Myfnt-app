@@ -7,6 +7,7 @@ import 'package:mivent/features/home/presentation/widgets/booking_detail_sheet.d
 import 'package:mivent/features/home/presentation/widgets/booking_list_section.dart';
 import 'package:mivent/features/home/presentation/widgets/calendar_widget.dart';
 import 'package:mivent/features/home/presentation/widgets/empty_state.dart';
+import 'package:mivent/widgets/quick_actions_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,15 +51,13 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: _controller.selectedTab == 0
-          ? FloatingActionButton.extended(
-              onPressed: () => showAddBookingPlaceholder(context),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text(
-                'حجز جديد',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+          ? QuickActionsButton(
+              onAddBooking: () => showAddBookingPlaceholder(context),
+              onAddReceipt: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('إضافة سند قبض ستُفعّل لاحقًا')),
+                );
+              },
             )
           : null,
       bottomNavigationBar: NavigationBar(

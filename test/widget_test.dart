@@ -62,12 +62,16 @@ void main() {
     expect(find.text('اليوم'), findsWidgets);
   });
 
-  testWidgets('يظهر زر حجز جديد', (tester) async {
+  testWidgets('يظهر زر الإجراءات السريعة ويفتح خياراته', (tester) async {
     await tester.pumpWidget(const MiventApp());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('حجز جديد'), findsOneWidget);
+    expect(find.byTooltip('الإجراءات السريعة'), findsOneWidget);
+    await tester.tap(find.byTooltip('الإجراءات السريعة'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('إضافة حجز'), findsOneWidget);
+    expect(find.text('إضافة سند قبض'), findsOneWidget);
   });
 
   testWidgets('يفتح تفاصيل الحجز عند الضغط', (tester) async {
@@ -93,7 +97,9 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    await tester.tap(find.text('حجز جديد'));
+    await tester.tap(find.byTooltip('الإجراءات السريعة'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('إضافة حجز'));
     await tester.pumpAndSettle();
 
     expect(find.text('إضافة حجز جديد'), findsOneWidget);
