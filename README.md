@@ -1,17 +1,30 @@
-# mivent_flutter_app
+# ميفنت (Mivent)
 
-A new Flutter project.
+تطبيق Flutter عربي لإدارة الحجوزات وتنظيم المواعيد من خلال تقويم شهري بسيط وواضح.
 
-## Getting Started
+## المزايا الحالية
 
-This project is a starting point for a Flutter application.
+- واجهة عربية كاملة باتجاه RTL.
+- تقويم شهري مع التنقل بين الأشهر والعودة إلى اليوم الحالي.
+- حالات الأيام: محجوز، جزئي، ومتاح.
+- ملخص سريع لعدد الحجوزات والأيام المتاحة.
+- عرض تفاصيل اليوم وإضافة حجز من خلال Bottom Sheet.
+- شريط تنقل سفلي للتقويم والحجوزات والدفعات والحساب الشخصي.
+- تصميم Material 3 متجاوب مع دعم الوضع الأساسي للهواتف والأجهزة الأكبر.
 
-A few resources to get you started if this is your first Flutter project:
+## التشغيل
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## الاختبارات
+
+```bash
+flutter test
+```
+
+## الهيكل
+
+النسخة الحالية تركز على تجربة الشاشة الرئيسية والسيناريو الأساسي للحجز، مع إبقاء المشروع جاهزًا لإضافة طبقة البيانات المحلية، الإشعارات والمزامنة لاحقًا.
