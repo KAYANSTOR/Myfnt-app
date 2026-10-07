@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mivent/core/theme/app_theme.dart';
-import 'package:mivent/features/home/presentation/pages/home_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'core/theme/app_theme.dart';
+import 'features/home/presentation/home_screen.dart';
 
 void main() {
-  runApp(const MiventApp());
+  runApp(
+    // ProviderScope يُغلّف التطبيق كاملاً لتشغيل Riverpod
+    const ProviderScope(
+      child: MiventApp(),
+    ),
+  );
 }
 
 class MiventApp extends StatelessWidget {
@@ -14,14 +21,11 @@ class MiventApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ميفنت',
-      theme: AppTheme.light,
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
-      home: const HomePage(),
+      theme: appTheme,
+      home: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: HomeScreen(),
+      ),
     );
   }
 }

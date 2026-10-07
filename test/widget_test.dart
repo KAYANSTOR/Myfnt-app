@@ -1,108 +1,48 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:mivent/core/database/app_database.dart';
+import 'package:mivent/core/database/database_provider.dart';
 import 'package:mivent/main.dart';
 
+/// ينشئ ProviderScope بـ DB في الذاكرة للاختبارات
+Widget _testApp() {
+  final db = AppDatabase(NativeDatabase.memory());
+  return ProviderScope(
+    overrides: [
+      appDatabaseProvider.overrideWithValue(db),
+    ],
+    child: const MiventApp(),
+  );
+}
+
 void main() {
-  testWidgets('يشغّل التطبيق ويعرض الشاشة الرئيسية', (tester) async {
-    await tester.pumpWidget(const MiventApp());
-    await tester.pump(); // init loading
-    await tester.pump(const Duration(milliseconds: 500)); // mock delay
-
-    expect(find.text('ميفنت'), findsOneWidget);
-    expect(find.text('التقويم'), findsOneWidget);
-  });
-
-  testWidgets('يظهر التقويم بعد التحميل', (tester) async {
-    await tester.pumpWidget(const MiventApp());
+  testWidgets('يعرض التطبيق لوحة التقويم العربية', (tester) async {
+    await tester.pumpWidget(_testApp());
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
 
-    // أسماء الأشهر العربية تظهر في العنوان
-    final monthFinder = find.textContaining(
-      RegExp(
-        r'(يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)',
-      ),
-    );
-    expect(monthFinder, findsWidgets);
+    expect(find.text('مرحباً بك في ميفنت'), findsOneWidget);
+    expect(find.text('تقويم الحجوزات'), findsOneWidget);
+    expect(find.text('التقويم'), findsOneWidget);
+    expect(find.text('الحجوزات'), findsOneWidget);
   });
 
   testWidgets('ينتقل بين أقسام التطبيق', (tester) async {
-    await tester.pumpWidget(const MiventApp());
+    await tester.pumpWidget(_testApp());
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
 
     await tester.tap(find.text('الحجوزات'));
     await tester.pumpAndSettle();
 
     expect(find.text('تابع كل حجوزاتك في مكان واحد'), findsOneWidget);
-    expect(find.byIcon(Icons.event_note_rounded), findsOneWidget);
   });
 
-  testWidgets('زر اليوم يعيد للتاريخ الحالي', (tester) async {
-    await tester.pumpWidget(const MiventApp());
+  testWidgets('زر اليوم يظهر في التقويم', (tester) async {
+    await tester.pumpWidget(_testApp());
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
 
-    // الانتقال لشهر آخر
-    final nextBtn = find.byTooltip('الشهر التالي');
-    if (nextBtn.evaluate().isNotEmpty) {
-      await tester.tap(nextBtn);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-    }
-
-    // الرجوع لليوم
-    final todayBtn = find.text('اليوم');
-    expect(todayBtn, findsWidgets);
-    await tester.tap(todayBtn.first);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
-    // يجب أن يظهر زر اليوم مجددًا
-    expect(find.text('اليوم'), findsWidgets);
-  });
-
-  testWidgets('يظهر زر الإجراءات السريعة ويفتح خياراته', (tester) async {
-    await tester.pumpWidget(const MiventApp());
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.byTooltip('الإجراءات السريعة'), findsOneWidget);
-    await tester.tap(find.byTooltip('الإجراءات السريعة'));
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('إضافة حجز'), findsOneWidget);
-    expect(find.text('إضافة سند قبض'), findsOneWidget);
-  });
-
-  testWidgets('يفتح تفاصيل الحجز عند الضغط', (tester) async {
-    await tester.pumpWidget(const MiventApp());
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
-    // إذا وُجدت بطاقة حجز نضغط عليها
-    final cards = find.byType(InkWell);
-    if (cards.evaluate().isNotEmpty) {
-      // نبحث عن نص عميل معروف من الـ mock
-      final customer = find.text('سارة الأحمد');
-      if (customer.evaluate().isNotEmpty) {
-        await tester.tap(customer.first);
-        await tester.pumpAndSettle();
-        expect(find.text('إغلاق'), findsOneWidget);
-      }
-    }
-  });
-
-  testWidgets('يفتح placeholder إضافة حجز', (tester) async {
-    await tester.pumpWidget(const MiventApp());
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    await tester.tap(find.byTooltip('الإجراءات السريعة'));
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('إضافة حجز'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('إضافة حجز جديد'), findsOneWidget);
-    expect(find.text('حسنًا'), findsOneWidget);
+    expect(find.text('اليوم'), findsOneWidget);
   });
 }

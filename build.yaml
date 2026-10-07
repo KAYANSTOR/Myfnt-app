@@ -1,0 +1,12 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # استخدام SQL مكتوب يدوياً بدلاً من Dart API عند الحاجة
+          sql:
+            dialect: sqlite
+          # تحسين الأداء: توليد كود أقل
+          generate_connect_constructor: true
+          # RTL: أسماء عربية مقبولة في الحقول
+          store_date_time_values_as_text: false
