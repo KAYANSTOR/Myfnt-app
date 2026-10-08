@@ -25,21 +25,6 @@ class BookingRepository {
   Stream<List<Booking>> watchAll() =>
       _dao.watchAll().map((rows) => rows.map(_rowToBooking).toList());
 
-  /// بحث نصي في الاسم أو رقم الحجز دون تعديل مخطط قاعدة البيانات.
-  Future<List<Booking>> searchBookings({required String query}) async {
-    final normalized = query.trim().toLowerCase();
-    if (normalized.isEmpty) return const <Booking>[];
-
-    final bookings = await watchAll().first;
-    return bookings
-        .where(
-          (booking) =>
-              booking.customerName.toLowerCase().contains(normalized) ||
-              booking.id.toString().contains(normalized),
-        )
-        .toList();
-  }
-
   // ── عمليات CRUD ──────────────────────────────────
 
   Future<int> addBooking({

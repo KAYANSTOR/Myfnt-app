@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../bookings/presentation/add_booking_sheet.dart';
-import '../../bookings/presentation/bookings_screen.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
 import '../widgets/home_header.dart';
@@ -31,7 +30,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         index: _selectedTab,
         children: [
           const _CalendarTab(),
-          const BookingsScreen(),
+          const _PlaceholderTab(
+            title: 'الحجوزات',
+            icon: Icons.event_note,
+            subtitle: 'تابع كل حجوزاتك في مكان واحد',
+          ),
           const _PlaceholderTab(
             title: 'الدفعات',
             icon: Icons.account_balance_wallet_outlined,
