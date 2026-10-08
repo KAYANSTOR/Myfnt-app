@@ -44,6 +44,17 @@ class BookingRepository {
         .toList());
   }
 
+  Future<List<Booking>> searchBookings({required String query}) async {
+    final normalized = query.trim();
+    if (normalized.isEmpty) return const <Booking>[];
+
+    final rows = await _db.bookingsDao.search(
+      companyId: _companyId,
+      query: normalized,
+    );
+    return rows.map(BookingMapper.toDomain).toList();
+  }
+
   Future<String> addBooking({
     required String customerName,
     String? customerPhone,

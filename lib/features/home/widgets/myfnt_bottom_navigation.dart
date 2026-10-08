@@ -111,7 +111,7 @@ class _MyfntBottomNavigationState extends State<MyfntBottomNavigation> {
                         borderRadius: BorderRadius.circular(40),
                         splashColor: Colors.white.withValues(alpha: .12),
                         onTap: widget.onAddPressed,
-                        child: const Semantics(
+                        child: Semantics(
                           label: 'إضافة حجز جديد',
                           button: true,
                           child: Icon(Icons.add, color: Colors.white, size: 32),
