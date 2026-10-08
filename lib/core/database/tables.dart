@@ -24,8 +24,8 @@ class CompaniesTable extends Table {
   TextColumn get source => text().withDefault(const Constant('offline_app'))();
   IntColumn get serverVersion => integer().named('server_version').withDefault(const Constant(0))();
   BoolColumn get serverAdopted => boolean().named('server_adopted').withDefault(const Constant(false))();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -41,8 +41,8 @@ class UsersTable extends Table {
   TextColumn get name => text().withLength(min: 1, max: 100)();
   TextColumn get phoneE164 => text().named('phone_e164').nullable()();
   BoolColumn get noPasswordExported => boolean().named('no_password_exported').withDefault(const Constant(true))();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -70,7 +70,7 @@ class CompanySettingsTable extends Table {
   TextColumn get seasonStartMmdd => text().named('season_start_mmdd').withDefault(const Constant('03-10'))();
   TextColumn get seasonEndMmdd => text().named('season_end_mmdd').withDefault(const Constant('09-30'))();
   TextColumn get reminderDays => text().named('reminder_days').map(const JsonListConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -101,8 +101,8 @@ class CustomersTable extends Table {
   BoolColumn get intentionalDuplicate => boolean().named('intentional_duplicate').withDefault(const Constant(false))();
   IntColumn get serverVersion => integer().named('server_version').withDefault(const Constant(0))();
   BoolColumn get serverAdopted => boolean().named('server_adopted').withDefault(const Constant(false))();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -125,11 +125,11 @@ class BookingsTable extends Table {
   TextColumn get bookingNo => text().named('booking_no')();
   TextColumn get customerId => text().named('customer_id')();
   TextColumn get eventDate => text().named('event_date')();
-  DateTimeColumn get startsAt => dateTime().named('starts_at').map(const NullableUtcDateTimeConverter()).nullable()();
-  DateTimeColumn get endsAt => dateTime().named('ends_at').map(const NullableUtcDateTimeConverter()).nullable()();
+  TextColumn get startsAt => text().named('starts_at').map(const NullableUtcDateTimeConverter()).nullable()();
+  TextColumn get endsAt => text().named('ends_at').map(const NullableUtcDateTimeConverter()).nullable()();
   TextColumn get confirmation => text().withDefault(const Constant('confirmed'))();
   TextColumn get status => text().withDefault(const Constant('active'))();
-  DateTimeColumn get temporaryExpiresAt => dateTime().named('temporary_expires_at').map(const NullableUtcDateTimeConverter()).nullable()();
+  TextColumn get temporaryExpiresAt => text().named('temporary_expires_at').map(const NullableUtcDateTimeConverter()).nullable()();
   IntColumn get amountMinor => integer().named('amount_minor').withDefault(const Constant(0))();
   IntColumn get paidMinor => integer().named('paid_minor').withDefault(const Constant(0))();
   TextColumn get currency => text().withDefault(const Constant('YER'))();
@@ -143,8 +143,8 @@ class BookingsTable extends Table {
   TextColumn get createdByName => text().named('created_by_name').nullable()();
   TextColumn get updatedById => text().named('updated_by_id').nullable()();
   TextColumn get updatedByName => text().named('updated_by_name').nullable()();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -177,7 +177,7 @@ class BookingDetailsTable extends Table {
   TextColumn get adjustmentReason => text().named('adjustment_reason').nullable()();
   IntColumn get agreedTotalMinor => integer().named('agreed_total_minor').withDefault(const Constant(0))();
   TextColumn get currency => text().withDefault(const Constant('YER'))();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -208,7 +208,7 @@ class PaymentsTable extends Table {
   TextColumn get externalReference => text().named('external_reference').nullable()();
   TextColumn get memo => text().nullable()();
   TextColumn get tag => text().nullable()();
-  DateTimeColumn get postedAt => dateTime().named('posted_at').map(const UtcDateTimeConverter())();
+  TextColumn get postedAt => text().named('posted_at').map(const UtcDateTimeConverter())();
   TextColumn get status => text().withDefault(const Constant('posted'))();
   TextColumn get reversalReason => text().named('reversal_reason').nullable()();
   TextColumn get bookingNoSnapshot => text().named('booking_no_snapshot').nullable()();
@@ -219,8 +219,8 @@ class PaymentsTable extends Table {
   TextColumn get createdByName => text().named('created_by_name').nullable()();
   TextColumn get editedById => text().named('edited_by_id').nullable()();
   TextColumn get editedByName => text().named('edited_by_name').nullable()();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -246,7 +246,7 @@ class BookingAuditTable extends Table {
   TextColumn get reason => text().nullable()();
   TextColumn get beforeJson => text().named('before_json').map(const NullableJsonMapConverter())();
   TextColumn get afterJson => text().named('after_json').map(const NullableJsonMapConverter())();
-  DateTimeColumn get happenedAt => dateTime().named('happened_at').map(const UtcDateTimeConverter())();
+  TextColumn get happenedAt => text().named('happened_at').map(const UtcDateTimeConverter())();
   TextColumn get source => text().withDefault(const Constant('offline_app'))();
 
   @override
@@ -277,12 +277,12 @@ class OutboxTable extends Table {
   IntColumn get attempts => integer().withDefault(const Constant(0))();
   TextColumn get lastError => text().named('last_error').nullable()();
   IntColumn get lastHttpStatus => integer().named('last_http_status').nullable()();
-  DateTimeColumn get nextAttemptAt => dateTime().named('next_attempt_at').map(const NullableUtcDateTimeConverter()).nullable()();
-  DateTimeColumn get leaseUntil => dateTime().named('lease_until').map(const NullableUtcDateTimeConverter()).nullable()();
+  TextColumn get nextAttemptAt => text().named('next_attempt_at').map(const NullableUtcDateTimeConverter()).nullable()();
+  TextColumn get leaseUntil => text().named('lease_until').map(const NullableUtcDateTimeConverter()).nullable()();
   BoolColumn get retryable => boolean().withDefault(const Constant(true))();
   TextColumn get latestLocalPayload => text().named('latest_local_payload').map(const NullableJsonMapConverter()).nullable()();
-  DateTimeColumn get createdAt => dateTime().named('created_at').map(const UtcDateTimeConverter())();
-  DateTimeColumn get updatedAt => dateTime().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt => text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt => text().named('updated_at').map(const UtcDateTimeConverter())();
 
   @override
   Set<Column> get primaryKey => {seq};
