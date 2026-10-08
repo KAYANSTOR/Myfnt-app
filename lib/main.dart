@@ -7,18 +7,18 @@ import 'features/home/presentation/home_screen.dart';
 void main() {
   runApp(
     // ProviderScope يُغلّف التطبيق كاملاً لتشغيل Riverpod
-    const ProviderScope(child: MiventApp()),
+    const ProviderScope(child: MyfntApp()),
   );
 }
 
-class MiventApp extends StatelessWidget {
-  const MiventApp({super.key});
+class MyfntApp extends StatelessWidget {
+  const MyfntApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'ميفنت',
+      title: 'Myfnt',
       theme: appTheme,
       home: const Directionality(
         textDirection: TextDirection.rtl,

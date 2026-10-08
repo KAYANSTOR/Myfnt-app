@@ -1,5 +1,5 @@
-name: mivent
-description: "تطبيق ميفنت لإدارة الحجوزات والتقويم باللغة العربية."
+name: myfnt
+description: "تطبيق Myfnt لإدارة الحجوزات والتقويم باللغة العربية."
 publish_to: 'none'
 version: 1.0.0+2
 
