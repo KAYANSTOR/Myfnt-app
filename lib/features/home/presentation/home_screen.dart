@@ -6,6 +6,7 @@ import '../../bookings/presentation/add_booking_sheet.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
 import '../widgets/home_header.dart';
+import '../widgets/myfnt_bottom_navigation.dart';
 
 /// الشاشة الرئيسية — تنسّق فقط، لا تحتوي منطقاً
 class HomeScreen extends ConsumerStatefulWidget {
@@ -46,40 +47,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _selectedTab == 0
-          ? FloatingActionButton(
-              onPressed: () => showAddBookingSheet(context, DateTime.now()),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 4,
-              child: const Icon(Icons.calendar_month_rounded),
-            )
-          : null,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: MyfntBottomNavigation(
         selectedIndex: _selectedTab,
-        onDestinationSelected: (i) => setState(() => _selectedTab = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'التقويم',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            selectedIcon: Icon(Icons.event_note),
-            label: 'الحجوزات',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.payments_outlined),
-            selectedIcon: Icon(Icons.payments),
-            label: 'الدفعات',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'حسابي',
-          ),
-        ],
+        onIndexChanged: (i) => setState(() => _selectedTab = i),
+        onAddPressed: () => showAddBookingSheet(context, DateTime.now()),
       ),
     );
   }
@@ -96,17 +67,14 @@ class _CalendarTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // التقويم القابل للطي (الشريط ثابت دائمًا)
           const CalendarGrid(),
 
           const SizedBox(height: 8),
 
-          // قسم الحجوزات (يظهر دائمًا مثل الصورة الثانية)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
-                // عنوان القسم
                 Row(
                   children: [
                     Expanded(
@@ -136,7 +104,6 @@ class _CalendarTab extends ConsumerWidget {
                 ),
                 const SizedBox(height: 14),
 
-                // فلاتر الحجوزات
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -156,7 +123,6 @@ class _CalendarTab extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // ملخص سريع
                 const BookingSummaryCard(),
               ],
             ),
