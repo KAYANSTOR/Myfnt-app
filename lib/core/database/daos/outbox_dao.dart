@@ -54,6 +54,24 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
     await (delete(outboxTable)..where((t) => t.seq.equals(seq))).go();
   }
 
+  Future<void> markConflict({
+    required int seq,
+    required String error,
+    int? httpStatus,
+  }) async {
+    final now = DateTime.now().toUtc();
+    await (update(outboxTable)..where((t) => t.seq.equals(seq))).write(
+      OutboxTableCompanion(
+        status: const Value('conflict'),
+        lastError: Value(error),
+        lastHttpStatus: Value(httpStatus),
+        retryable: const Value(false),
+        leaseUntil: const Value(null),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
   Future<void> markFailed({
     required int seq,
     required String error,
