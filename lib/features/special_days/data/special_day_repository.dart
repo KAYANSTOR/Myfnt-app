@@ -1,7 +1,7 @@
+// ignore_for_file: prefer_initializing_formals, unused_field
 import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/helpers/uuid_generator.dart';
-import '../../../core/database/tables.dart';
 
 class SpecialDayRepository {
   SpecialDayRepository({required AppDatabase db, required String companyId, required String actorId, required String actorName}) : _db = db, _companyId = companyId, _actorId = actorId, _actorName = actorName;
