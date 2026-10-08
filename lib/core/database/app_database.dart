@@ -35,6 +35,10 @@ part 'app_database.g.dart';
     SmsApprovalsTable,
     NotificationsTable,
     NotificationJobsTable,
+    SyncConflictsTable,
+    EntityTombstonesTable,
+    LocalMetaTable,
+    SnapshotsTable,
   ],
   daos: [
     BookingsDao,
@@ -48,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -93,6 +97,13 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(smsApprovalsTable);
             await m.createTable(notificationsTable);
             await m.createTable(notificationJobsTable);
+            await _createIndexes();
+          }
+          if (from < 5) {
+            await m.createTable(syncConflictsTable);
+            await m.createTable(entityTombstonesTable);
+            await m.createTable(localMetaTable);
+            await m.createTable(snapshotsTable);
             await _createIndexes();
           }
         },
@@ -166,6 +177,18 @@ class AppDatabase extends _$AppDatabase {
           'ON notifications(company_id, read_at)',
       'CREATE INDEX IF NOT EXISTS idx_notification_jobs_status_scheduled '
           'ON notification_jobs(company_id, status, scheduled_at)',
+      'CREATE INDEX IF NOT EXISTS idx_sync_conflicts_status '
+          'ON sync_conflicts(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_sync_conflicts_entity '
+          'ON sync_conflicts(company_id, entity_type, entity_id)',
+      'CREATE INDEX IF NOT EXISTS idx_tombstones_entity_key '
+          'ON entity_tombstones(entity_key)',
+      'CREATE INDEX IF NOT EXISTS idx_tombstones_remote_required '
+          'ON entity_tombstones(company_id, remote_required)',
+      'CREATE INDEX IF NOT EXISTS idx_local_meta_workspace_key '
+          'ON local_meta(workspace, key)',
+      'CREATE INDEX IF NOT EXISTS idx_snapshots_workspace_kind '
+          'ON snapshots(workspace, kind, created_at DESC)',
     ];
     for (final sql in indexes) {
       await customStatement(sql);

@@ -693,3 +693,145 @@ class NotificationJobsTable extends Table {
         'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
       ];
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase 7 — بنية المزامنة
+// ═══════════════════════════════════════════════════════════════════
+
+@DataClassName('SyncConflictRow')
+class SyncConflictsTable extends Table {
+  @override
+  String get tableName => 'sync_conflicts';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get entityType => text().named('entity_type')();
+  TextColumn get entityId => text().named('entity_id')();
+  TextColumn get entityKey => text().named('entity_key')();
+  TextColumn get operation => text()();
+  TextColumn get localCommandId =>
+      text().named('local_command_id').nullable()();
+  IntColumn get baseVersion =>
+      integer().named('base_version').withDefault(const Constant(0))();
+  IntColumn get remoteVersion =>
+      integer().named('remote_version').nullable()();
+  TextColumn get localPayload =>
+      text().named('local_payload').map(const JsonMapConverter())();
+  TextColumn get remotePayload => text()
+      .named('remote_payload')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get localSnapshot => text()
+      .named('local_snapshot')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get status => text().withDefault(const Constant('open'))();
+  TextColumn get source => text().nullable()();
+  TextColumn get error => text().nullable()();
+  TextColumn get resolvedById => text().named('resolved_by_id').nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get resolvedAt => text()
+      .named('resolved_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('EntityTombstoneRow')
+class EntityTombstonesTable extends Table {
+  @override
+  String get tableName => 'entity_tombstones';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get entityKey => text().named('entity_key')();
+  TextColumn get entityType => text().named('entity_type')();
+  TextColumn get entityId => text().named('entity_id')();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get operation => text()();
+  TextColumn get reason => text().nullable()();
+  TextColumn get snapshot => text()
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  IntColumn get baseVersion =>
+      integer().named('base_version').withDefault(const Constant(0))();
+  BoolColumn get remoteRequired => boolean()
+      .named('remote_required')
+      .withDefault(const Constant(true))();
+  BoolColumn get adoptionSettled => boolean()
+      .named('adoption_settled')
+      .withDefault(const Constant(false))();
+  TextColumn get adoptionId => text().named('adoption_id').nullable()();
+  TextColumn get deletedAt =>
+      text().named('deleted_at').map(const UtcDateTimeConverter())();
+  TextColumn get syncedAt => text()
+      .named('synced_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get adoptionSettledAt => text()
+      .named('adoption_settled_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'UNIQUE(entity_key)',
+      ];
+}
+
+@DataClassName('LocalMetaRow')
+class LocalMetaTable extends Table {
+  @override
+  String get tableName => 'local_meta';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id').nullable()();
+  TextColumn get userId => text().named('user_id').nullable()();
+  TextColumn get workspace => text()();
+  TextColumn get key => text()();
+  TextColumn get value => text()
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  TextColumn get expiresAt => text()
+      .named('expires_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => ['UNIQUE(workspace, key)'];
+}
+
+@DataClassName('SnapshotRow')
+class SnapshotsTable extends Table {
+  @override
+  String get tableName => 'snapshots';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get userId => text().named('user_id')();
+  TextColumn get workspace => text()();
+  TextColumn get kind => text().withDefault(const Constant('emergency'))();
+  IntColumn get schemaVersion =>
+      integer().named('schema_version').withDefault(const Constant(4))();
+  TextColumn get payload => text().map(const JsonMapConverter())();
+  TextColumn get sha256 => text().withDefault(const Constant(''))();
+  IntColumn get sizeBytes =>
+      integer().named('size_bytes').withDefault(const Constant(0))();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
