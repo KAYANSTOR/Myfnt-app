@@ -835,3 +835,193 @@ class SnapshotsTable extends Table {
         'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
       ];
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase 8 — العضويات والاشتراكات والمحاسبة
+// ═══════════════════════════════════════════════════════════════════
+
+@DataClassName('CompanyMembershipRow')
+class CompanyMembershipsTable extends Table {
+  @override
+  String get tableName => 'company_memberships';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get userId => text().named('user_id')();
+  TextColumn get role => text().withDefault(const Constant('manager'))();
+  TextColumn get permissions => text()
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  TextColumn get invitedById => text().named('invited_by_id').nullable()();
+  TextColumn get joinedAt =>
+      text().named('joined_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE',
+        'UNIQUE(company_id, user_id)',
+      ];
+}
+
+@DataClassName('PlanRow')
+class PlansTable extends Table {
+  @override
+  String get tableName => 'plans';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get code => text().unique()();
+  TextColumn get nameAr => text().named('name_ar')();
+  TextColumn get nameEn => text().named('name_en').nullable()();
+  TextColumn get tagline => text().nullable()();
+  IntColumn get monthlyPrice =>
+      integer().named('monthly_price').nullable()();
+  IntColumn get annualPrice => integer().named('annual_price').nullable()();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  TextColumn get limits => text().map(const JsonMapConverter())();
+  TextColumn get features => text()
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  IntColumn get sortOrder =>
+      integer().named('sort_order').withDefault(const Constant(0))();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('CompanySubscriptionRow')
+class CompanySubscriptionsTable extends Table {
+  @override
+  String get tableName => 'company_subscriptions';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get planCode => text().named('plan_code')();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  TextColumn get billingCycle =>
+      text().named('billing_cycle').withDefault(const Constant('annual'))();
+  IntColumn get paidAmountMinor =>
+      integer().named('paid_amount_minor').withDefault(const Constant(0))();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  TextColumn get paymentMethod => text().named('payment_method').nullable()();
+  TextColumn get startsAt =>
+      text().named('starts_at').map(const UtcDateTimeConverter())();
+  TextColumn get expiresAt => text()
+      .named('expires_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get cancelledAt => text()
+      .named('cancelled_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get notes => text().nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('WalletRow')
+class WalletsTable extends Table {
+  @override
+  String get tableName => 'wallets';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get name => text().withLength(min: 1, max: 100)();
+  TextColumn get kind => text().withDefault(const Constant('cash'))();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  IntColumn get cachedBalanceMinor => integer()
+      .named('cached_balance_minor')
+      .withDefault(const Constant(0))();
+  BoolColumn get isDefault =>
+      boolean().named('is_default').withDefault(const Constant(false))();
+  BoolColumn get active => boolean().withDefault(const Constant(true))();
+  BoolColumn get balanceIsDerived => boolean()
+      .named('balance_is_derived')
+      .withDefault(const Constant(true))();
+  TextColumn get notes => text().nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('JournalEntryRow')
+class JournalEntriesTable extends Table {
+  @override
+  String get tableName => 'journal_entries';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get entryNo => text().named('entry_no')();
+  TextColumn get kind => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get reference => text().nullable()();
+  TextColumn get status => text().withDefault(const Constant('posted'))();
+  TextColumn get sourceType => text().named('source_type').nullable()();
+  TextColumn get sourceId => text().named('source_id').nullable()();
+  IntColumn get totalDebitMinor => integer()
+      .named('total_debit_minor')
+      .withDefault(const Constant(0))();
+  IntColumn get totalCreditMinor => integer()
+      .named('total_credit_minor')
+      .withDefault(const Constant(0))();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  TextColumn get createdById => text().named('created_by_id').nullable()();
+  TextColumn get createdByName => text().named('created_by_name').nullable()();
+  TextColumn get postedAt =>
+      text().named('posted_at').map(const UtcDateTimeConverter())();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'UNIQUE(company_id, entry_no)',
+      ];
+}
+
+@DataClassName('JournalLineRow')
+class JournalLinesTable extends Table {
+  @override
+  String get tableName => 'journal_lines';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get entryId => text().named('entry_id')();
+  TextColumn get side => text()();
+  TextColumn get accountCode =>
+      text().named('account_code').withDefault(const Constant('cash'))();
+  TextColumn get accountName => text().named('account_name').nullable()();
+  IntColumn get amountMinor => integer().named('amount_minor')();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  TextColumn get refType => text().named('ref_type').nullable()();
+  TextColumn get refId => text().named('ref_id').nullable()();
+  TextColumn get note => text().nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'FOREIGN KEY (entry_id) REFERENCES journal_entries(id) ON DELETE CASCADE',
+      ];
+}

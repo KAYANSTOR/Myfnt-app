@@ -39,6 +39,12 @@ part 'app_database.g.dart';
     EntityTombstonesTable,
     LocalMetaTable,
     SnapshotsTable,
+    CompanyMembershipsTable,
+    PlansTable,
+    CompanySubscriptionsTable,
+    WalletsTable,
+    JournalEntriesTable,
+    JournalLinesTable,
   ],
   daos: [
     BookingsDao,
@@ -52,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -104,6 +110,15 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(entityTombstonesTable);
             await m.createTable(localMetaTable);
             await m.createTable(snapshotsTable);
+            await _createIndexes();
+          }
+          if (from < 6) {
+            await m.createTable(companyMembershipsTable);
+            await m.createTable(plansTable);
+            await m.createTable(companySubscriptionsTable);
+            await m.createTable(walletsTable);
+            await m.createTable(journalEntriesTable);
+            await m.createTable(journalLinesTable);
             await _createIndexes();
           }
         },
@@ -189,6 +204,26 @@ class AppDatabase extends _$AppDatabase {
           'ON local_meta(workspace, key)',
       'CREATE INDEX IF NOT EXISTS idx_snapshots_workspace_kind '
           'ON snapshots(workspace, kind, created_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_memberships_company_role '
+          'ON company_memberships(company_id, role)',
+      'CREATE INDEX IF NOT EXISTS idx_memberships_user '
+          'ON company_memberships(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_plans_status_sort '
+          'ON plans(status, sort_order)',
+      'CREATE INDEX IF NOT EXISTS idx_subscriptions_company_status '
+          'ON company_subscriptions(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_subscriptions_expires '
+          'ON company_subscriptions(expires_at)',
+      'CREATE INDEX IF NOT EXISTS idx_wallets_company_default '
+          'ON wallets(company_id, is_default)',
+      'CREATE INDEX IF NOT EXISTS idx_journal_entries_company_posted '
+          'ON journal_entries(company_id, posted_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_journal_entries_source '
+          'ON journal_entries(source_type, source_id)',
+      'CREATE INDEX IF NOT EXISTS idx_journal_lines_entry '
+          'ON journal_lines(entry_id)',
+      'CREATE INDEX IF NOT EXISTS idx_journal_lines_account '
+          'ON journal_lines(company_id, account_code)',
     ];
     for (final sql in indexes) {
       await customStatement(sql);
