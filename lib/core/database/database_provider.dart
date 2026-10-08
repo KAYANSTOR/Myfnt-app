@@ -1,20 +1,30 @@
+// lib/core/database/database_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_database.dart';
+import 'daos/bookings_dao.dart';
+import 'daos/customers_dao.dart';
+import 'daos/outbox_dao.dart';
+import 'daos/payments_dao.dart';
 
-/// Provider لقاعدة البيانات — instance واحد طوال عمر التطبيق
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
-  ref.onDispose(db.close);
+  ref.onDispose(() => db.close());
   return db;
 });
 
-/// Provider لـ DAO الحجوزات
 final bookingsDaoProvider = Provider<BookingsDao>((ref) {
   return ref.watch(appDatabaseProvider).bookingsDao;
 });
 
-/// Provider لـ DAO العملاء
 final customersDaoProvider = Provider<CustomersDao>((ref) {
   return ref.watch(appDatabaseProvider).customersDao;
+});
+
+final paymentsDaoProvider = Provider<PaymentsDao>((ref) {
+  return ref.watch(appDatabaseProvider).paymentsDao;
+});
+
+final outboxDaoProvider = Provider<OutboxDao>((ref) {
+  return ref.watch(appDatabaseProvider).outboxDao;
 });

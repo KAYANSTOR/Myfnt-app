@@ -2,9 +2,9 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/database-v2]
   pull_request:
-    branches: [main]
+    branches: [main, feat/database-v2]
 
 permissions:
   contents: read

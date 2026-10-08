@@ -1,26 +1,7 @@
 // lib/core/database/app_database.dart
-//
-// قاعدة بيانات Myfnt — الكلاس الرئيسي.
-//
-// Contract:
-//   - schemaVersion = 2 (ترقية من 1).
-//   - WAL Mode مفعّل.
-//   - Foreign Keys مفعّلة.
-//   - اسم الملف: `myfnt_db.sqlite`.
-//
-// ملاحظة: بعد تعديل tables/DAOs يجب تشغيل:
-//   dart run build_runner build --delete-conflicting-outputs
-
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 
-import 'converters/json_converter.dart';
-import 'converters/utc_datetime_converter.dart';
-import 'converters/uuid_converter.dart';
 import 'daos/bookings_dao.dart';
 import 'daos/customers_dao.dart';
 import 'daos/outbox_dao.dart';
@@ -49,7 +30,8 @@ part 'app_database.g.dart';
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+  AppDatabase([QueryExecutor? executor])
+      : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 2;
@@ -62,90 +44,82 @@ class AppDatabase extends _$AppDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
-            // Session 2: drop everything and recreate (no production data yet).
-            for (final table in allTables) {
-              await m.deleteTable(table.actualTableName);
+            await customStatement('PRAGMA foreign_keys = OFF');
+            const tablesToDrop = [
+              'outbox',
+              'booking_audit',
+              'booking_details',
+              'payments',
+              'bookings',
+              'customers',
+              'company_settings',
+              'users',
+              'companies',
+            ];
+            for (final t in tablesToDrop) {
+              await customStatement('DROP TABLE IF EXISTS $t');
             }
+            await customStatement('PRAGMA foreign_keys = ON');
             await m.createAll();
             await _createIndexes();
           }
         },
         beforeOpen: (details) async {
-          // WAL + Foreign Keys + performance PRAGMAs.
-          await customStatement('PRAGMA journal_mode=WAL');
-          await customStatement('PRAGMA foreign_keys=ON');
-          await customStatement('PRAGMA synchronous=NORMAL');
-          await customStatement('PRAGMA temp_store=MEMORY');
-          await customStatement('PRAGMA mmap_size=268435456');
+          await customStatement('PRAGMA foreign_keys = ON');
+          await customStatement('PRAGMA journal_mode = WAL');
+          await customStatement('PRAGMA synchronous = NORMAL');
+          await customStatement('PRAGMA cache_size = -8000');
+          await customStatement('PRAGMA busy_timeout = 5000');
+          await customStatement('PRAGMA journal_size_limit = 10485760');
         },
       );
 
   Future<void> _createIndexes() async {
-    // Companies
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_companies_name ON companies(name)',
-    );
+    const indexes = [
+      'CREATE INDEX IF NOT EXISTS idx_bookings_company_date '
+          'ON bookings(company_id, event_date)',
+      'CREATE INDEX IF NOT EXISTS idx_bookings_company_status '
+          'ON bookings(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_bookings_company_customer '
+          'ON bookings(company_id, customer_id)',
+      'CREATE INDEX IF NOT EXISTS idx_bookings_company_no '
+          'ON bookings(company_id, booking_no)',
+      'CREATE INDEX IF NOT EXISTS idx_booking_details_booking '
+          'ON booking_details(booking_id)',
+      'CREATE INDEX IF NOT EXISTS idx_payments_company_booking '
+          'ON payments(company_id, booking_id)',
+      'CREATE INDEX IF NOT EXISTS idx_payments_company_status '
+          'ON payments(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_payments_company_posted '
+          'ON payments(company_id, posted_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_customers_company_phone '
+          'ON customers(company_id, phone_key)',
+      'CREATE INDEX IF NOT EXISTS idx_customers_company_name '
+          'ON customers(company_id, name_key)',
+      'CREATE INDEX IF NOT EXISTS idx_customers_company_no '
+          'ON customers(company_id, customer_no)',
+      'CREATE INDEX IF NOT EXISTS idx_booking_audit_booking '
+          'ON booking_audit(booking_id, happened_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_outbox_company_status_created '
+          'ON outbox(company_id, status, created_at ASC)',
+      'CREATE INDEX IF NOT EXISTS idx_outbox_entity_key '
+          'ON outbox(entity_key)',
+    ];
+    for (final sql in indexes) {
+      await customStatement(sql);
+    }
+  }
 
-    // Users
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_users_company ON users(company_id)',
-    );
-
-    // Customers
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_customers_search ON customers(search_text)',
-    );
-
-    // Bookings — hot paths
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_bookings_company_date ON bookings(company_id, event_date)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_bookings_search ON bookings(search_text)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_bookings_updated ON bookings(updated_at)',
-    );
-
-    // Payments
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_payments_booking ON payments(booking_id)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_payments_company ON payments(company_id)',
-    );
-
-    // Outbox
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_outbox_status ON outbox(status)',
-    );
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_outbox_created ON outbox(created_at)',
-    );
-
-    // Audit
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_audit_booking ON booking_audit(booking_id)',
-    );
+  Future<void> performMaintenance() async {
+    await customStatement('PRAGMA incremental_vacuum');
+    await customStatement('PRAGMA optimize');
+    await customStatement('PRAGMA wal_checkpoint(TRUNCATE)');
   }
 }
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'myfnt_db.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
+QueryExecutor _openConnection() {
+  return driftDatabase(
+    name: 'myfnt_db',
+    native: DriftNativeOptions(shareAcrossIsolates: true),
+  );
 }
