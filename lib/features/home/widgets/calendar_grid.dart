@@ -7,8 +7,8 @@ import '../../bookings/providers/booking_providers.dart';
 import 'calendar_day.dart';
 import 'month_navigator.dart';
 
-/// شبكة التقويم الكاملة
-/// تقرأ من monthBookingsMapProvider فقط — لا تعرف شيئاً عن DB
+/// تقويم الحجوزات الاحترافي لميفنت.
+/// يبقى مرتبطاً بمزودي Riverpod الحاليين، لذلك لا يتغير منطق قاعدة البيانات.
 class CalendarGrid extends ConsumerWidget {
   const CalendarGrid({super.key});
 
@@ -19,62 +19,75 @@ class CalendarGrid extends ConsumerWidget {
     final month = ref.watch(selectedMonthProvider);
     final bookingsMap = ref.watch(monthBookingsMapProvider);
     final asyncBookings = ref.watch(monthBookingsProvider);
-
+    final summary = ref.watch(monthSummaryProvider);
     final now = DateTime.now();
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    // الأحد = 0 في Flutter weekday % 7
     final firstWeekday = DateTime(month.year, month.month, 1).weekday % 7;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 14, 12, 16),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textDark.withOpacity(.06),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
         child: Column(
           children: [
-            const MonthNavigator(),
-            const SizedBox(height: 12),
-            // رؤوس أيام الأسبوع
-            Row(
-              children: _weekDays
-                  .map(
-                    (d) => Expanded(
-                      child: Center(
-                        child: Text(
-                          d,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textMid,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-            const SizedBox(height: 9),
-            // حالة التحميل — فقط المرة الأولى
-            if (asyncBookings.isLoading && bookingsMap.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            else
-              GridView.count(
-                crossAxisCount: 7,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 5,
-                childAspectRatio: .84,
+            _CalendarHeader(summary: summary),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+              child: Column(
                 children: [
-                  // خلايا فارغة قبل بداية الشهر
-                  for (var i = 0; i < firstWeekday; i++) const SizedBox(),
-                  // أيام الشهر
-                  for (var day = 1; day <= daysInMonth; day++)
-                    _buildDayCell(ref, month, day, now, bookingsMap),
+                  const MonthNavigator(),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: _weekDays
+                        .map(
+                          (day) => Expanded(
+                            child: Center(
+                              child: Text(
+                                day,
+                                style: const TextStyle(
+                                  color: AppColors.textMid,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  if (asyncBookings.isLoading && bookingsMap.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    GridView.count(
+                      crossAxisCount: 7,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 7,
+                      crossAxisSpacing: 5,
+                      childAspectRatio: .78,
+                      children: [
+                        for (var i = 0; i < firstWeekday; i++) const SizedBox(),
+                        for (var day = 1; day <= daysInMonth; day++)
+                          _buildDayCell(ref, month, day, now, bookingsMap),
+                      ],
+                    ),
                 ],
               ),
+            ),
           ],
         ),
       ),
@@ -89,22 +102,76 @@ class CalendarGrid extends ConsumerWidget {
     Map<DateTime, List<Booking>> bookingsMap,
   ) {
     final date = DateTime(month.year, month.month, day);
-    final isToday =
-        date.year == now.year && date.month == now.month && date.day == now.day;
-    final dayBookings = bookingsMap[date] ?? const <Booking>[];
+    final selectedDay = ref.watch(selectedDayProvider);
+    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    final isSelected = selectedDay != null &&
+        date.year == selectedDay.year &&
+        date.month == selectedDay.month &&
+        date.day == selectedDay.day;
 
     return CalendarDay(
       day: day,
       isToday: isToday,
-      bookings: dayBookings,
-      onTap: () {
-        ref.read(selectedDayProvider.notifier).state = date;
-      },
+      isSelected: isSelected,
+      bookings: bookingsMap[date] ?? const <Booking>[],
+      onTap: () => ref.read(selectedDayProvider.notifier).state = date,
     );
   }
 }
 
-/// دليل حالات الأيام
+class _CalendarHeader extends StatelessWidget {
+  const _CalendarHeader({required this.summary});
+  final MonthSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 17),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primaryDark, AppColors.primary],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+      ),
+      child: Row(
+        children: [
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('نظرة عامة', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                SizedBox(height: 4),
+                Text('مواعيدك هذا الشهر', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900)),
+              ],
+            ),
+          ),
+          _SummaryValue(value: '${summary.bookedDays}', label: 'محجوز'),
+          const SizedBox(width: 18),
+          _SummaryValue(value: '${summary.availableDays}', label: 'متاح'),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryValue extends StatelessWidget {
+  const _SummaryValue({required this.value, required this.label});
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 2),
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w700)),
+      ],
+    );
+  }
+}
+
 class CalendarLegend extends StatelessWidget {
   const CalendarLegend({super.key});
 
@@ -132,16 +199,9 @@ class _LegendItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
+        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: AppColors.textMid),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMid, fontWeight: FontWeight.w600)),
       ],
     );
   }

@@ -6,7 +6,8 @@ import '../../bookings/presentation/add_booking_sheet.dart';
 import '../../bookings/providers/booking_providers.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
-import '../widgets/home_header.dart';
+import '../widgets/mivent_bottom_navigation.dart';
+import '../widgets/mivent_top_bar.dart';
 
 /// الشاشة الرئيسية — تنسّق فقط، لا تحتوي منطقاً
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,10 +23,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(76),
-        child: HomeHeader(),
-      ),
+      appBar: const MiventTopBar(),
       body: IndexedStack(
         index: _selectedTab,
         children: [
@@ -47,43 +45,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _selectedTab == 0
-          ? FloatingActionButton.extended(
-              onPressed: () => showAddBookingSheet(context, DateTime.now()),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: const Text(
-                'حجز جديد',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            )
-          : null,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: MiventBottomNavigation(
         selectedIndex: _selectedTab,
-        onDestinationSelected: (i) => setState(() => _selectedTab = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'التقويم',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            selectedIcon: Icon(Icons.event_note),
-            label: 'الحجوزات',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.payments_outlined),
-            selectedIcon: Icon(Icons.payments),
-            label: 'الدفعات',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'حسابي',
-          ),
-        ],
+        onIndexChanged: (i) => setState(() => _selectedTab = i),
+        onAddPressed: () => showAddBookingSheet(context, DateTime.now()),
       ),
     );
   }

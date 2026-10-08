@@ -3,58 +3,78 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../bookings/domain/booking.dart';
 
-/// خلية يوم واحد في التقويم
-/// تتلقى البيانات كـ parameters — لا تعرف شيئاً عن Riverpod أو DB
+/// خلية يوم واحدة في تقويم ميفنت.
 class CalendarDay extends StatelessWidget {
   const CalendarDay({
     super.key,
     required this.day,
     required this.isToday,
+    required this.isSelected,
     required this.bookings,
     required this.onTap,
   });
 
   final int day;
   final bool isToday;
-  final List<Booking> bookings; // قائمة الحجوزات الحقيقية
+  final bool isSelected;
+  final List<Booking> bookings;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final status = _dayStatus();
-    final bg = _bgColor(status);
-    final fg = _fgColor(status);
-    final dotColor = _dotColor(status);
+    final isActive = isToday || isSelected;
+    final background = isActive
+        ? AppColors.primary
+        : status == _DayStatus.available
+            ? AppColors.surface
+            : AppColors.primaryLight.withOpacity(.72);
+    final foreground = isActive ? Colors.white : _fgColor(status);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(13),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isToday ? AppColors.primary : bg,
-          borderRadius: BorderRadius.circular(13),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '$day',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: isToday ? Colors.white : fg,
+    return Semantics(
+      button: true,
+      label: '$day، ${bookings.length} حجوزات',
+      selected: isSelected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(15),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(15),
+            border: isSelected && !isToday
+                ? Border.all(color: AppColors.primary, width: 2)
+                : null,
+            boxShadow: isToday
+                ? [BoxShadow(color: AppColors.primary.withOpacity(.28), blurRadius: 9, offset: const Offset(0, 4))]
+                : null,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$day',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: foreground),
               ),
-            ),
-            const SizedBox(height: 5),
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isToday ? Colors.white : dotColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              if (bookings.isNotEmpty)
+                Text(
+                  '${bookings.length}',
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: foreground.withOpacity(.78)),
+                )
+              else
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: isActive ? Colors.white70 : _dotColor(status),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -62,28 +82,13 @@ class CalendarDay extends StatelessWidget {
 
   _DayStatus _dayStatus() {
     if (bookings.isEmpty) return _DayStatus.available;
-    final hasConfirmed = bookings.any(
-      (b) => b.status == BookingStatus.confirmed,
-    );
-    if (hasConfirmed) return _DayStatus.booked;
-    final hasPartial = bookings.any((b) => b.status == BookingStatus.partial);
-    if (hasPartial) return _DayStatus.partial;
+    if (bookings.any((b) => b.status == BookingStatus.confirmed)) return _DayStatus.booked;
+    if (bookings.any((b) => b.status == BookingStatus.partial)) return _DayStatus.partial;
     return _DayStatus.available;
   }
 
-  Color _bgColor(_DayStatus s) {
-    switch (s) {
-      case _DayStatus.booked:
-        return AppColors.primaryLight;
-      case _DayStatus.partial:
-        return AppColors.primaryLight;
-      case _DayStatus.available:
-        return AppColors.surface;
-    }
-  }
-
-  Color _fgColor(_DayStatus s) {
-    switch (s) {
+  Color _fgColor(_DayStatus status) {
+    switch (status) {
       case _DayStatus.booked:
         return AppColors.booked;
       case _DayStatus.partial:
@@ -93,8 +98,8 @@ class CalendarDay extends StatelessWidget {
     }
   }
 
-  Color _dotColor(_DayStatus s) {
-    switch (s) {
+  Color _dotColor(_DayStatus status) {
+    switch (status) {
       case _DayStatus.booked:
         return AppColors.booked;
       case _DayStatus.partial:
