@@ -56,7 +56,8 @@ class TextNormalizer {
   ///     → "احمد 967777123456 b-001"
   static String buildSearchText(Iterable<String?> parts) {
     return parts
-        .where((p) => p != null && p.isNotEmpty)
+        .whereType<String>()
+        .where((p) => p.isNotEmpty)
         .map(normalize)
         .join(' ');
   }
