@@ -45,6 +45,18 @@ part 'app_database.g.dart';
     WalletsTable,
     JournalEntriesTable,
     JournalLinesTable,
+    FeatureCatalogTable,
+    PlanFeaturesTable,
+    CompanyFeatureOverridesTable,
+    CompanyMessageNumbersTable,
+    NotificationTemplatesTable,
+    AlertTemplatesTable,
+    AttachmentsTable,
+    UsageCountersTable,
+    SmsWalletsTable,
+    AdminAnnouncementsTable,
+    AdminAnnouncementReadsTable,
+    MessageGatewaysTable,
   ],
   daos: [
     BookingsDao,
@@ -58,7 +70,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -119,6 +131,21 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(walletsTable);
             await m.createTable(journalEntriesTable);
             await m.createTable(journalLinesTable);
+            await _createIndexes();
+          }
+          if (from < 7) {
+            await m.createTable(featureCatalogTable);
+            await m.createTable(planFeaturesTable);
+            await m.createTable(companyFeatureOverridesTable);
+            await m.createTable(companyMessageNumbersTable);
+            await m.createTable(notificationTemplatesTable);
+            await m.createTable(alertTemplatesTable);
+            await m.createTable(attachmentsTable);
+            await m.createTable(usageCountersTable);
+            await m.createTable(smsWalletsTable);
+            await m.createTable(adminAnnouncementsTable);
+            await m.createTable(adminAnnouncementReadsTable);
+            await m.createTable(messageGatewaysTable);
             await _createIndexes();
           }
         },
@@ -224,6 +251,28 @@ class AppDatabase extends _$AppDatabase {
           'ON journal_lines(entry_id)',
       'CREATE INDEX IF NOT EXISTS idx_journal_lines_account '
           'ON journal_lines(company_id, account_code)',
+      'CREATE INDEX IF NOT EXISTS idx_feature_catalog_group '
+          'ON feature_catalog(group_code, status, sort_order)',
+      'CREATE INDEX IF NOT EXISTS idx_plan_features_plan '
+          'ON plan_features(plan_code, feature_code)',
+      'CREATE INDEX IF NOT EXISTS idx_company_overrides_feature '
+          'ON company_feature_overrides(company_id, feature_code, status)',
+      'CREATE INDEX IF NOT EXISTS idx_msg_numbers_company '
+          'ON company_message_numbers(company_id, status, channel)',
+      'CREATE INDEX IF NOT EXISTS idx_notification_templates_code '
+          'ON notification_templates(code, enabled)',
+      'CREATE INDEX IF NOT EXISTS idx_alert_templates_code '
+          'ON alert_templates(code, enabled)',
+      'CREATE INDEX IF NOT EXISTS idx_attachments_entity '
+          'ON attachments(company_id, entity_type, entity_id)',
+      'CREATE INDEX IF NOT EXISTS idx_usage_counters_period '
+          'ON usage_counters(company_id, metric_code, period_key)',
+      'CREATE INDEX IF NOT EXISTS idx_admin_announcements_active '
+          'ON admin_announcements(status, starts_at, expires_at)',
+      'CREATE INDEX IF NOT EXISTS idx_announcement_reads_user '
+          'ON admin_announcement_reads(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_message_gateways_route '
+          'ON message_gateways(channel, status, priority)',
     ];
     for (final sql in indexes) {
       await customStatement(sql);
