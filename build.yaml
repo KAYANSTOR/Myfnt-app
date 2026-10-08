@@ -6,5 +6,9 @@ targets:
           # استخدام SQL مكتوب يدوياً بدلاً من Dart API عند الحاجة
           sql:
             dialect: sqlite
-          # RTL: أسماء عربية مقبولة في الحقول
-          store_date_time_values_as_text: false
+          # يُخزَّن DateTime كنص ISO-8601 (متوافق مع المستودع الأصلي)
+          store_date_time_values_as_text: true
+          # تحسينات إضافية
+          named_parameters: true
+          generate_values_in_copy_with: true
+          data_class_to_companions: true
