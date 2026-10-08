@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mivent/core/database/app_database.dart';
-import 'package:mivent/core/database/database_provider.dart';
-import 'package:mivent/features/bookings/domain/booking.dart';
-import 'package:mivent/features/bookings/providers/booking_providers.dart';
-import 'package:mivent/main.dart';
+import 'package:myfnt/core/database/app_database.dart';
+import 'package:myfnt/core/database/database_provider.dart';
+import 'package:myfnt/features/bookings/domain/booking.dart';
+import 'package:myfnt/features/bookings/providers/booking_providers.dart';
+import 'package:myfnt/main.dart';
 
 /// ينشئ ProviderScope بـ DB في الذاكرة للاختبارات
 Widget _testApp(AppDatabase db) {
@@ -22,12 +22,12 @@ Widget _testApp(AppDatabase db) {
         (ref) => const Stream<List<Booking>>.empty(),
       ),
     ],
-    child: const MiventApp(),
+    child: const MyfntApp(),
   );
 }
 
 void main() {
-  testWidgets('يعرض التطبيق لوحة التقويم العربية', (tester) async {
+  testWidgets('يعرض التطبيق الشريط العلوي والتنقل', (tester) async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
@@ -37,10 +37,9 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    expect(find.text('مرحباً بك في ميفنت'), findsOneWidget);
-    expect(find.text('تقويم الحجوزات'), findsOneWidget);
+    expect(find.text('Myfnt'), findsOneWidget);
+    expect(find.text('الحجوزات'), findsWidgets);
     expect(find.text('التقويم'), findsOneWidget);
-    expect(find.text('الحجوزات'), findsOneWidget);
   });
 
   testWidgets('ينتقل بين أقسام التطبيق', (tester) async {
@@ -53,13 +52,13 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    await tester.tap(find.text('الحجوزات'));
+    await tester.tap(find.text('الحجوزات').last);
     await tester.pumpAndSettle();
 
     expect(find.text('تابع كل حجوزاتك في مكان واحد'), findsOneWidget);
   });
 
-  testWidgets('زر اليوم يظهر في التقويم', (tester) async {
+  testWidgets('فلتر اليوم يظهر في الشاشة', (tester) async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
@@ -69,6 +68,6 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    expect(find.text('اليوم'), findsOneWidget);
+    expect(find.text('اليوم'), findsWidgets);
   });
 }

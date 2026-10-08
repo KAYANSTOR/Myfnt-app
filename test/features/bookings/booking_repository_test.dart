@@ -1,8 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mivent/core/database/app_database.dart';
-import 'package:mivent/features/bookings/data/booking_repository.dart';
-import 'package:mivent/features/bookings/domain/booking.dart';
+import 'package:myfnt/core/database/app_database.dart';
+import 'package:myfnt/features/bookings/data/booking_repository.dart';
+import 'package:myfnt/features/bookings/domain/booking.dart';
 
 /// ينشئ DB في الذاكرة — سريع ولا يترك أثراً على الجهاز
 AppDatabase _inMemoryDb() => AppDatabase(NativeDatabase.memory());
@@ -45,9 +45,9 @@ void main() {
 
       final booking = Booking(
         id: id,
-        customerName: 'محمد خالد', // اسم محدَّث
+        customerName: 'محمد خالد',
         date: DateTime(2026, 10, 10),
-        status: BookingStatus.confirmed, // حالة محدَّثة
+        status: BookingStatus.confirmed,
       );
       await repo.updateBooking(booking);
 
@@ -111,18 +111,15 @@ void main() {
     test('watchByMonth يتحدث عند إضافة حجز جديد', () async {
       final stream = repo.watchByMonth(2026, 10);
 
-      // أول قيمة: فارغ
       final first = await stream.first;
       expect(first, isEmpty);
 
-      // إضافة حجز
       await repo.addBooking(
         customerName: 'عميل جديد',
         date: DateTime(2026, 10, 8),
         status: BookingStatus.confirmed,
       );
 
-      // القيمة الثانية: تحتوي الحجز
       final second = await repo.watchByMonth(2026, 10).first;
       expect(second.length, 1);
     });

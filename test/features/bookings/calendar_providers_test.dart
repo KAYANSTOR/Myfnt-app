@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mivent/features/bookings/providers/booking_providers.dart';
+import 'package:myfnt/features/bookings/providers/booking_providers.dart';
 
 void main() {
   group('selectedMonthProvider —', () {
@@ -39,7 +39,6 @@ void main() {
     });
 
     test('next() يتعامل مع انتقال السنة (ديسمبر → يناير)', () {
-      // نذهب لديسمبر أولاً
       final now = DateTime.now();
       final monthsToAdd = 12 - now.month;
       for (var i = 0; i < monthsToAdd; i++) {
@@ -48,7 +47,6 @@ void main() {
       final dec = container.read(selectedMonthProvider);
       expect(dec.month, 12);
 
-      // ننتقل لشهر التالي
       container.read(selectedMonthProvider.notifier).next();
       final jan = container.read(selectedMonthProvider);
       expect(jan.month, 1);
@@ -57,7 +55,6 @@ void main() {
 
     test('previous() يتعامل مع انتقال السنة (يناير → ديسمبر)', () {
       final now = DateTime.now();
-      // نذهب ليناير
       for (var i = 0; i < now.month - 1; i++) {
         container.read(selectedMonthProvider.notifier).previous();
       }
@@ -71,7 +68,6 @@ void main() {
     });
 
     test('goToToday() يعود للشهر الحالي', () {
-      // ننتقل بعيداً
       for (var i = 0; i < 5; i++) {
         container.read(selectedMonthProvider.notifier).next();
       }

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mivent/features/bookings/domain/booking.dart';
+import 'package:myfnt/features/bookings/domain/booking.dart';
 
 void main() {
   group('Booking model —', () {

@@ -67,14 +67,9 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
     final now = DateTime.now();
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
 
-    // بداية الأسبوع من السبت
-    // Flutter: weekday 1=Mon ... 7=Sun
-    // نريد السبت = 0
+    // بداية الأسبوع من السبت (Sat = 0)
     final firstOfMonth = DateTime(month.year, month.month, 1);
-    final firstWeekday = (firstOfMonth.weekday % 7); // Sun=0 ... Sat=6 → نعدل
-    // تحويل: نريد السبت = 0
-    // Sat=6 → 0, Sun=7→0? أفضل حساب يدوي:
-    final startOffset = (firstOfMonth.weekday + 1) % 7; // يجعل السبت = 0
+    final startOffset = (firstOfMonth.weekday + 1) % 7;
 
     return Column(
       children: [
@@ -122,7 +117,7 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
         // ── جسم التقويم (قابل للطي) ──
         SizeTransition(
           sizeFactor: _expandAnimation,
-          axisAlignment: -1.0,
+          alignment: Alignment.topCenter,
           child: ClipRRect(
             borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(20),
@@ -186,7 +181,6 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
     required DateTime now,
     required Map<DateTime, List<Booking>> bookingsMap,
   }) {
-    // أيام الشهر السابق لملء البداية
     final prevMonth = DateTime(month.year, month.month, 0);
     final daysInPrev = prevMonth.day;
 
@@ -205,7 +199,6 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
         childAspectRatio: 0.92,
       ),
       itemBuilder: (context, index) {
-        // أيام الشهر السابق
         if (index < startOffset) {
           final day = daysInPrev - startOffset + index + 1;
           return CalendarDay(
@@ -217,7 +210,6 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
           );
         }
 
-        // أيام الشهر الحالي
         final dayIndex = index - startOffset;
         if (dayIndex < daysInMonth) {
           final day = dayIndex + 1;
@@ -238,7 +230,6 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
           );
         }
 
-        // أيام الشهر التالي
         final nextDay = dayIndex - daysInMonth + 1;
         return CalendarDay(
           day: nextDay,

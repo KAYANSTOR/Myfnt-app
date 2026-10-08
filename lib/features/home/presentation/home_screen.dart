@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../bookings/presentation/add_booking_sheet.dart';
-import '../../bookings/providers/booking_providers.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
 import '../widgets/home_header.dart';
@@ -157,7 +156,7 @@ class _CalendarTab extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // ملخص سريع (اختياري)
+                // ملخص سريع
                 const BookingSummaryCard(),
               ],
             ),
