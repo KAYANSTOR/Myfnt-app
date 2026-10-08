@@ -125,6 +125,10 @@ class BookingController {
     double amountTotal = 0,
     double amountPaid = 0,
     String currency = 'YER',
+    String? packageId,
+    String? packageName,
+    int? packagePriceMinor,
+    int? depositMinor,
   }) =>
       _repo.addBooking(
         customerName: customerName,
@@ -135,6 +139,10 @@ class BookingController {
         amountTotal: amountTotal,
         amountPaid: amountPaid,
         currency: currency,
+        packageId: packageId,
+        packageName: packageName,
+        packagePriceMinor: packagePriceMinor,
+        depositMinor: depositMinor,
       );
 
   Future<void> updateBooking(Booking booking) => _repo.updateBooking(booking);

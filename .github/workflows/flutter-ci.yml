@@ -39,4 +39,11 @@ jobs:
       - name: Test
         run: flutter test
 
-      # APK generation is intentionally paused. Re-enable this step when requested.
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Upload universal release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: myfnt-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk

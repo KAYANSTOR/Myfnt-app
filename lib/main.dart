@@ -1,12 +1,13 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/company/company_providers.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/presentation/home_screen.dart';
 
 void main() {
   runApp(
-    // ProviderScope يُغلّف التطبيق كاملاً لتشغيل Riverpod
     const ProviderScope(child: MyfntApp()),
   );
 }
@@ -20,9 +21,81 @@ class MyfntApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Myfnt',
       theme: appTheme,
-      home: const Directionality(
+      home: const _BootstrapGate(),
+    );
+  }
+}
+
+/// بوابة التهيئة — تضمن وجود الشركة والمستخدم والإعدادات
+/// قبل عرض الواجهة الرئيسية.
+class _BootstrapGate extends ConsumerWidget {
+  const _BootstrapGate();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bootstrap = ref.watch(companyBootstrapProvider);
+
+    return bootstrap.when(
+      loading: () => const _SplashScreen(),
+      error: (error, _) => _ErrorScreen(message: error.toString()),
+      data: (_) => const Directionality(
         textDirection: TextDirection.rtl,
         child: HomeScreen(),
+      ),
+    );
+  }
+}
+
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('جاري تهيئة التطبيق...'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorScreen extends StatelessWidget {
+  const _ErrorScreen({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text(
+                  'فشل تحميل التطبيق',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(message, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

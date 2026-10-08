@@ -53,6 +53,10 @@ class BookingRepository {
     double amountTotal = 0,
     double amountPaid = 0,
     String currency = 'YER',
+    String? packageId,
+    String? packageName,
+    int? packagePriceMinor,
+    int? depositMinor,
   }) async {
     return _db.transaction(() async {
       final now = DateTime.now().toUtc();
@@ -69,6 +73,9 @@ class BookingRepository {
 
       final amountMinor = (amountTotal * 100).round();
       final paidMinor = (amountPaid * 100).round();
+      final resolvedPackageName = packageName ?? 'مناسبة';
+      final resolvedPackagePrice = packagePriceMinor ?? amountMinor;
+      final resolvedDeposit = depositMinor ?? 0;
 
       final bookingNo = await _nextBookingNo();
 
@@ -113,7 +120,10 @@ class BookingRepository {
               companyId: _companyId,
               customerNameSnapshot: customerName,
               customerPhoneSnapshot: Value(customerPhone),
-              packageNameSnapshot: 'مناسبة',
+              packageId: Value(packageId),
+              packageNameSnapshot: resolvedPackageName,
+              packagePriceMinorSnapshot: Value(resolvedPackagePrice),
+              depositMinorSnapshot: Value(resolvedDeposit),
               description: Value(note),
               agreedTotalMinor: Value(amountMinor),
               currency: Value(currency),
@@ -159,6 +169,8 @@ class BookingRepository {
                 'currency': currency,
                 'status': fields.status,
                 'confirmation': fields.confirmation,
+                'packageId': packageId,
+                'packageName': resolvedPackageName,
               },
               createdAt: now,
               updatedAt: now,
@@ -326,13 +338,7 @@ class BookingRepository {
   }
 
   Future<String> _nextBookingNo() async {
-    final rows = await _db.bookingsDao.getAll();
-    var max = 0;
-    for (final r in rows) {
-      if (r.companyId != _companyId) continue;
-      final n = int.tryParse(r.bookingNo) ?? 0;
-      if (n > max) max = n;
-    }
+    final max = await _db.bookingsDao.maxBookingNo(_companyId);
     return (max + 1).toString();
   }
 }

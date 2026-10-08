@@ -109,4 +109,18 @@ class BookingsDao extends DatabaseAccessor<AppDatabase>
   Future<bool> updateDetails(BookingDetailsTableCompanion entry) {
     return update(bookingDetailsTable).replace(entry);
   }
+
+  /// أقصى رقم حجز حالي — بسرعة O(1) عبر SQL.
+  /// booking_no مخزَّن كنص، لذلك نحتاج CAST إلى INTEGER.
+  Future<int> maxBookingNo(String companyId) async {
+    final rows = await customSelect(
+      'SELECT MAX(CAST(booking_no AS INTEGER)) AS max_no '
+      'FROM bookings WHERE company_id = ?',
+      variables: [Variable<String>(companyId)],
+      readsFrom: {bookingsTable},
+    ).getSingleOrNull();
+
+    final value = rows?.read<int?>('max_no');
+    return value ?? 0;
+  }
 }
