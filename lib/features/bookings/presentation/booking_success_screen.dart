@@ -35,5 +35,5 @@ class BookingSuccessScreen extends StatelessWidget {
             ]),
           ])),
         ]),
-      );
+      ));
 }
