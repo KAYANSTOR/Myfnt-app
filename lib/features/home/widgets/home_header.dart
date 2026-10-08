@@ -53,7 +53,7 @@ class HomeHeader extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         const Text(
-                          'ميفنت',
+                          'Myfnt',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
