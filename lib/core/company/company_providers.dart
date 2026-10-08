@@ -1,8 +1,8 @@
 // lib/core/company/company_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../database/app_database.dart';
 import '../database/database_provider.dart';
-import '../database/tables.dart';
 import 'company_service.dart';
 
 final currentCompanyIdProvider = Provider<String>((ref) => kLocalCompanyId);

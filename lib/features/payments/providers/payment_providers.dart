@@ -2,8 +2,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/company/company_providers.dart';
+import '../../../core/database/app_database.dart';
 import '../../../core/database/database_provider.dart';
-import '../../../core/database/tables.dart';
 import '../data/payment_repository.dart';
 
 final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
