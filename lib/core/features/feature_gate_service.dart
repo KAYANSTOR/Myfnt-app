@@ -5,7 +5,7 @@ import 'feature_seed_data.dart';
 import 'models/feature_result.dart';
 
 class FeatureGateService {
-  FeatureGateService({required AppDatabase db, required String companyId}) : _db = db, _companyId = companyId;
+  FeatureGateService({required this._db, required this._companyId});
   final AppDatabase _db;
   final String _companyId;
 
