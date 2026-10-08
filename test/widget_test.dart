@@ -37,10 +37,10 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    expect(find.text('مرحباً بك في ميفنت'), findsOneWidget);
+    expect(find.text('ميفنت'), findsOneWidget);
     expect(find.text('تقويم الحجوزات'), findsOneWidget);
-    expect(find.text('التقويم'), findsOneWidget);
-    expect(find.text('الحجوزات'), findsOneWidget);
+    expect(find.bySemanticsLabel('التقويم'), findsOneWidget);
+    expect(find.bySemanticsLabel('الحجوزات'), findsOneWidget);
   });
 
   testWidgets('ينتقل بين أقسام التطبيق', (tester) async {
@@ -53,7 +53,7 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    await tester.tap(find.text('الحجوزات'));
+    await tester.tap(find.bySemanticsLabel('الحجوزات'));
     await tester.pumpAndSettle();
 
     expect(find.text('تابع كل حجوزاتك في مكان واحد'), findsOneWidget);
