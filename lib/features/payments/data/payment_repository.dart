@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_initializing_formals
 // lib/features/payments/data/payment_repository.dart
 import 'package:drift/drift.dart';
 
@@ -5,7 +6,6 @@ import '../../../core/database/app_database.dart';
 import '../../../core/database/enums/payment_direction.dart';
 import '../../../core/database/helpers/text_normalizer.dart';
 import '../../../core/database/helpers/uuid_generator.dart';
-import '../../../core/database/tables.dart';
 
 class PaymentRepository {
   PaymentRepository({

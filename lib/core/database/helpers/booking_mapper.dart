@@ -1,9 +1,7 @@
 // lib/core/database/helpers/booking_mapper.dart
-import 'package:drift/drift.dart';
 
 import '../../../features/bookings/domain/booking.dart';
 import '../app_database.dart';
-import '../tables.dart';
 
 class BookingMapper {
   BookingMapper._();

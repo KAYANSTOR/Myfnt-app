@@ -2,7 +2,6 @@
 import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
-import '../database/tables.dart';
 
 const String kLocalCompanyId = '00000000-0000-4000-8000-000000000001';
 const String kLocalUserId = '00000000-0000-4000-8000-000000000002';

@@ -1,10 +1,10 @@
+// ignore_for_file: prefer_initializing_formals
 // lib/features/customers/data/customer_repository.dart
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/database/helpers/text_normalizer.dart';
 import '../../../core/database/helpers/uuid_generator.dart';
-import '../../../core/database/tables.dart';
 
 class CustomerRepository {
   CustomerRepository({
