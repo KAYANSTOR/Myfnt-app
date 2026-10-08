@@ -1,5 +1,5 @@
 class DomainEvent {
-  const DomainEvent({required this.code, required this.entityType, required this.entityId, this.companyId, this.actorId, this.actorName, this.payload = const {}, DateTime? occurredAt}) : _occurredAt = occurredAt;
+  DomainEvent({required this.code, required this.entityType, required this.entityId, this.companyId, this.actorId, this.actorName, this.payload = const {}, DateTime? occurredAt}) : occurredAt = occurredAt ?? DateTime.now().toUtc();
   final String code;
   final String entityType;
   final String entityId;
@@ -7,8 +7,7 @@ class DomainEvent {
   final String? actorId;
   final String? actorName;
   final Map<String, dynamic> payload;
-  final DateTime? _occurredAt;
-  DateTime get occurredAt => _occurredAt ?? DateTime.now().toUtc();
+  final DateTime occurredAt;
   @override
   String toString() => 'DomainEvent($code: $entityType/$entityId)';
 }

@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import '../../database/app_database.dart';
-import '../../database/tables.dart';
 import '../api/api_client.dart';
 import '../models/sync_result.dart';
 
@@ -12,7 +11,7 @@ class PushWorker {
 
   Future<int> recoverStaleLeases() async {
     final now = DateTime.now().toUtc();
-    return (db.update(db.outboxTable)..where((t) => t.status.equals('sending') & t.leaseUntil.isSmallerThanValue(now))).write(OutboxTableCompanion(status: const Value('failed'), lastError: const Value('انتهت مهلة محاولة سابقة'), leaseUntil: const Value(null), updatedAt: Value(now)));
+    return (db.update(db.outboxTable)..where((t) => t.status.equals('sending') & t.leaseUntil.isSmallerThanValue(now.toIso8601String()))).write(OutboxTableCompanion(status: const Value('failed'), lastError: const Value('انتهت مهلة محاولة سابقة'), leaseUntil: const Value(null), updatedAt: Value(now)));
   }
 
   Future<PushResult> processBatch({int limit = 50}) async {
@@ -31,7 +30,7 @@ class PushWorker {
     final now = DateTime.now().toUtc();
     final leaseUntil = now.add(const Duration(seconds: 45));
     return db.transaction(() async {
-      final candidates = await (db.select(db.outboxTable)..where((t) => t.status.isIn(['pending', 'failed']) & t.attempts.isSmallerThanValue(_maxAttempts) & (t.nextAttemptAt.isNull() | t.nextAttemptAt.isSmallerOrEqualValue(now)))..orderBy([(t) => OrderingTerm.asc(t.createdAt)])..limit(limit)).get();
+      final candidates = await (db.select(db.outboxTable)..where((t) => t.status.isIn(['pending', 'failed']) & t.attempts.isSmallerThanValue(_maxAttempts) & (t.nextAttemptAt.isNull() | t.nextAttemptAt.isSmallerOrEqualValue(now.toIso8601String())))..orderBy([(t) => OrderingTerm.asc(t.createdAt)])..limit(limit)).get();
       if (candidates.isEmpty) return <OutboxRow>[];
       final ids = candidates.map((row) => row.seq).toList();
       await (db.update(db.outboxTable)..where((t) => t.seq.isIn(ids))).write(OutboxTableCompanion(status: const Value('sending'), leaseUntil: Value(leaseUntil), updatedAt: Value(now)));
@@ -39,7 +38,11 @@ class PushWorker {
     });
   }
 
-  Future<void> _failAll(List<OutboxRow> batch, String error) async { for (final row in batch) await _markFailed(row, error); }
+  Future<void> _failAll(List<OutboxRow> batch, String error) async {
+    for (final row in batch) {
+      await _markFailed(row, error);
+    }
+  }
   Future<PushResult> _processResults(List<OutboxRow> batch, PushBatchResponse response) async {
     final byId = {for (final result in response.results) result.opId: result};
     var synced = 0, failed = 0, conflicts = 0;
