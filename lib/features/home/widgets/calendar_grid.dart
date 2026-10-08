@@ -7,98 +7,246 @@ import '../../bookings/providers/booking_providers.dart';
 import 'calendar_day.dart';
 import 'month_navigator.dart';
 
-/// شبكة التقويم الكاملة
-/// تقرأ من monthBookingsMapProvider فقط — لا تعرف شيئاً عن DB
-class CalendarGrid extends ConsumerWidget {
+/// التقويم القابل للطي — شريط التنقل ثابت دائمًا
+class CalendarGrid extends ConsumerStatefulWidget {
   const CalendarGrid({super.key});
 
-  static const _weekDays = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+  @override
+  ConsumerState<CalendarGrid> createState() => _CalendarGridState();
+}
+
+class _CalendarGridState extends ConsumerState<CalendarGrid>
+    with SingleTickerProviderStateMixin {
+  // يبدأ مفتوحًا كما طُلب
+  bool _isExpanded = true;
+
+  late final AnimationController _controller;
+  late final Animation<double> _expandAnimation;
+
+  // أيام الأسبوع — تبدأ من السبت (RTL مطابق للمرجع)
+  static const _weekDays = ['سبت', 'أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع'];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOutCubic,
+    );
+    // يبدأ مفتوحًا
+    _controller.value = 1.0;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final month = ref.watch(selectedMonthProvider);
     final bookingsMap = ref.watch(monthBookingsMapProvider);
     final asyncBookings = ref.watch(monthBookingsProvider);
 
     final now = DateTime.now();
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    // الأحد = 0 في Flutter weekday % 7
-    final firstWeekday = DateTime(month.year, month.month, 1).weekday % 7;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 14, 12, 16),
-        child: Column(
-          children: [
-            const MonthNavigator(),
-            const SizedBox(height: 12),
-            // رؤوس أيام الأسبوع
-            Row(
-              children: _weekDays
-                  .map(
-                    (d) => Expanded(
-                      child: Center(
-                        child: Text(
-                          d,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textMid,
-                          ),
-                        ),
-                      ),
+    // بداية الأسبوع من السبت
+    // Flutter: weekday 1=Mon ... 7=Sun
+    // نريد السبت = 0
+    final firstOfMonth = DateTime(month.year, month.month, 1);
+    final firstWeekday = (firstOfMonth.weekday % 7); // Sun=0 ... Sat=6 → نعدل
+    // تحويل: نريد السبت = 0
+    // Sat=6 → 0, Sun=7→0? أفضل حساب يدوي:
+    final startOffset = (firstOfMonth.weekday + 1) % 7; // يجعل السبت = 0
+
+    return Column(
+      children: [
+        // ── شريط التنقل (دائم الظهور) ──
+        const MonthNavigator(),
+
+        const SizedBox(height: 10),
+
+        // ── مقبض الطي / الفتح ──
+        GestureDetector(
+          onTap: _toggle,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 48,
+            height: 22,
+            alignment: Alignment.center,
+            child: AnimatedRotation(
+              turns: _isExpanded ? 0.0 : 0.5,
+              duration: const Duration(milliseconds: 280),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFE8E0DC)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
                     ),
-                  )
-                  .toList(),
+                  ],
+                ),
+                child: Icon(
+                  Icons.keyboard_arrow_up_rounded,
+                  size: 16,
+                  color: AppColors.textMid,
+                ),
+              ),
             ),
-            const SizedBox(height: 9),
-            // حالة التحميل — فقط المرة الأولى
-            if (asyncBookings.isLoading && bookingsMap.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            else
-              GridView.count(
-                crossAxisCount: 7,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 5,
-                childAspectRatio: .84,
+          ),
+        ),
+
+        // ── جسم التقويم (قابل للطي) ──
+        SizeTransition(
+          sizeFactor: _expandAnimation,
+          axisAlignment: -1.0,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+            child: Container(
+              width: double.infinity,
+              color: Colors.transparent,
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 14),
+              child: Column(
                 children: [
-                  // خلايا فارغة قبل بداية الشهر
-                  for (var i = 0; i < firstWeekday; i++) const SizedBox(),
-                  // أيام الشهر
-                  for (var day = 1; day <= daysInMonth; day++)
-                    _buildDayCell(ref, month, day, now, bookingsMap),
+                  // رؤوس أيام الأسبوع
+                  Row(
+                    children: _weekDays
+                        .map(
+                          (d) => Expanded(
+                            child: Center(
+                              child: Text(
+                                d,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textMid,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // الشبكة
+                  if (asyncBookings.isLoading && bookingsMap.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 36),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  else
+                    _buildGrid(
+                      month: month,
+                      daysInMonth: daysInMonth,
+                      startOffset: startOffset,
+                      now: now,
+                      bookingsMap: bookingsMap,
+                    ),
                 ],
               ),
-          ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildDayCell(
-    WidgetRef ref,
-    DateTime month,
-    int day,
-    DateTime now,
-    Map<DateTime, List<Booking>> bookingsMap,
-  ) {
-    final date = DateTime(month.year, month.month, day);
-    final isToday =
-        date.year == now.year && date.month == now.month && date.day == now.day;
-    final dayBookings = bookingsMap[date] ?? const <Booking>[];
+  Widget _buildGrid({
+    required DateTime month,
+    required int daysInMonth,
+    required int startOffset,
+    required DateTime now,
+    required Map<DateTime, List<Booking>> bookingsMap,
+  }) {
+    // أيام الشهر السابق لملء البداية
+    final prevMonth = DateTime(month.year, month.month, 0);
+    final daysInPrev = prevMonth.day;
 
-    return CalendarDay(
-      day: day,
-      isToday: isToday,
-      bookings: dayBookings,
-      onTap: () {
-        ref.read(selectedDayProvider.notifier).state = date;
+    final totalCells = startOffset + daysInMonth;
+    final rows = (totalCells / 7).ceil();
+    final totalSlots = rows * 7;
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: totalSlots,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 5,
+        childAspectRatio: 0.92,
+      ),
+      itemBuilder: (context, index) {
+        // أيام الشهر السابق
+        if (index < startOffset) {
+          final day = daysInPrev - startOffset + index + 1;
+          return CalendarDay(
+            day: day,
+            isToday: false,
+            isCurrentMonth: false,
+            bookings: const [],
+            onTap: () {},
+          );
+        }
+
+        // أيام الشهر الحالي
+        final dayIndex = index - startOffset;
+        if (dayIndex < daysInMonth) {
+          final day = dayIndex + 1;
+          final date = DateTime(month.year, month.month, day);
+          final isToday = date.year == now.year &&
+              date.month == now.month &&
+              date.day == now.day;
+          final dayBookings = bookingsMap[date] ?? const <Booking>[];
+
+          return CalendarDay(
+            day: day,
+            isToday: isToday,
+            isCurrentMonth: true,
+            bookings: dayBookings,
+            onTap: () {
+              ref.read(selectedDayProvider.notifier).state = date;
+            },
+          );
+        }
+
+        // أيام الشهر التالي
+        final nextDay = dayIndex - daysInMonth + 1;
+        return CalendarDay(
+          day: nextDay,
+          isToday: false,
+          isCurrentMonth: false,
+          bookings: const [],
+          onTap: () {},
+        );
       },
     );
   }

@@ -23,24 +23,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(76),
+        preferredSize: Size.fromHeight(72),
         child: HomeHeader(),
       ),
       body: IndexedStack(
         index: _selectedTab,
         children: [
-          _CalendarTab(),
-          _PlaceholderTab(
+          const _CalendarTab(),
+          const _PlaceholderTab(
             title: 'الحجوزات',
             icon: Icons.event_note,
             subtitle: 'تابع كل حجوزاتك في مكان واحد',
           ),
-          _PlaceholderTab(
+          const _PlaceholderTab(
             title: 'الدفعات',
             icon: Icons.account_balance_wallet_outlined,
             subtitle: 'إدارة المدفوعات والفواتير',
           ),
-          _PlaceholderTab(
+          const _PlaceholderTab(
             title: 'الملف الشخصي',
             icon: Icons.person_outline,
             subtitle: 'حدّث بيانات حسابك وإعداداتك',
@@ -48,15 +48,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       floatingActionButton: _selectedTab == 0
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: () => showAddBookingSheet(context, DateTime.now()),
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: const Text(
-                'حجز جديد',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              elevation: 4,
+              child: const Icon(Icons.calendar_month_rounded),
             )
           : null,
       bottomNavigationBar: NavigationBar(
@@ -89,46 +86,124 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// تبويب التقويم
+/// تبويب التقويم — يعرض التقويم القابل للطي ثم قسم الحجوزات
 class _CalendarTab extends ConsumerWidget {
+  const _CalendarTab();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(18, 2, 18, 100),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 100),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const BookingSummaryCard(),
-          const SizedBox(height: 22),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'تقويم الحجوزات',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () =>
-                    ref.read(selectedMonthProvider.notifier).goToToday(),
-                icon: const Icon(Icons.today_outlined, size: 18),
-                label: const Text('اليوم'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
+          // التقويم القابل للطي (الشريط ثابت دائمًا)
           const CalendarGrid(),
-          const SizedBox(height: 18),
-          const Text(
-            'دليل الحالات',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+
+          const SizedBox(height: 8),
+
+          // قسم الحجوزات (يظهر دائمًا مثل الصورة الثانية)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                // عنوان القسم
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        thickness: 1,
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(
+                        'الحجوزات',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // فلاتر الحجوزات
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _FilterChip(label: 'مؤقت', selected: false),
+                      const SizedBox(width: 8),
+                      _FilterChip(label: 'مؤكد', selected: true),
+                      const SizedBox(width: 8),
+                      _FilterChip(label: 'القادمة', selected: false),
+                      const SizedBox(width: 8),
+                      _FilterChip(label: 'اليوم', selected: false),
+                      const SizedBox(width: 8),
+                      _FilterChip(label: 'الكل', selected: false),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ملخص سريع (اختياري)
+                const BookingSummaryCard(),
+              ],
+            ),
           ),
-          const SizedBox(height: 11),
-          const CalendarLegend(),
         ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+  });
+
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: selected ? AppColors.primary : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: selected ? AppColors.primary : const Color(0xFFE8E0DC),
+        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: selected ? Colors.white : AppColors.textDark,
+        ),
       ),
     );
   }
