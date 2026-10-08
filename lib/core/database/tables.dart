@@ -446,3 +446,250 @@ class PaymentAuditTable extends Table {
         'FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE',
       ];
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase 6 — الاتصالات والإشعارات
+// ═══════════════════════════════════════════════════════════════════
+
+@DataClassName('AlertRuleRow')
+class AlertRulesTable extends Table {
+  @override
+  String get tableName => 'alert_rules';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get name => text().withLength(min: 1, max: 100)();
+  TextColumn get eventCode =>
+      text().named('event_code').withDefault(const Constant('event.approaching'))();
+  TextColumn get direction => text().withDefault(const Constant('before'))();
+  IntColumn get intervalValue =>
+      integer().named('interval_value').withDefault(const Constant(1))();
+  TextColumn get intervalUnit =>
+      text().named('interval_unit').withDefault(const Constant('days'))();
+  TextColumn get recipientKind =>
+      text().named('recipient_kind').withDefault(const Constant('staff'))();
+  TextColumn get channels => text().map(const JsonListConverter())();
+  TextColumn get priority => text().withDefault(const Constant('normal'))();
+  TextColumn get clientTemplate =>
+      text().named('client_template').nullable()();
+  TextColumn get staffTemplate => text().named('staff_template').nullable()();
+  BoolColumn get enabled =>
+      boolean().withDefault(const Constant(true))();
+  IntColumn get sortOrder =>
+      integer().named('sort_order').withDefault(const Constant(0))();
+  IntColumn get serverVersion =>
+      integer().named('server_version').withDefault(const Constant(0))();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('SmsTemplateRow')
+class SmsTemplatesTable extends Table {
+  @override
+  String get tableName => 'sms_templates';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get code => text()();
+  TextColumn get name => text().withLength(min: 1, max: 100)();
+  TextColumn get body => text()();
+  TextColumn get variables => text()
+      .named('variables')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get category =>
+      text().withDefault(const Constant('notification'))();
+  BoolColumn get active =>
+      boolean().withDefault(const Constant(true))();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'UNIQUE(company_id, code)',
+      ];
+}
+
+@DataClassName('SmsMessageRow')
+class SmsMessagesTable extends Table {
+  @override
+  String get tableName => 'sms_messages';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get idempotencyKey =>
+      text().named('idempotency_key').unique()();
+  TextColumn get eventCode =>
+      text().named('event_code').withDefault(const Constant('custom'))();
+  TextColumn get bookingId => text().named('booking_id').nullable()();
+  TextColumn get paymentId => text().named('payment_id').nullable()();
+  TextColumn get customerId => text().named('customer_id').nullable()();
+  TextColumn get ruleId => text().named('rule_id').nullable()();
+  TextColumn get recipientPhone => text().named('recipient_phone')();
+  TextColumn get recipientKind =>
+      text().named('recipient_kind').withDefault(const Constant('client'))();
+  TextColumn get recipientName =>
+      text().named('recipient_name').nullable()();
+  TextColumn get message => text()();
+  TextColumn get status => text().withDefault(const Constant('queued'))();
+  BoolColumn get requiresApproval => boolean()
+      .named('requires_approval')
+      .withDefault(const Constant(false))();
+  TextColumn get approvalStatus => text()
+      .named('approval_status')
+      .withDefault(const Constant('not_required'))();
+  TextColumn get approvedAt => text()
+      .named('approved_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get approvedBy => text().named('approved_by').nullable()();
+  TextColumn get scheduledAt =>
+      text().named('scheduled_at').map(const UtcDateTimeConverter())();
+  TextColumn get sentAt => text()
+      .named('sent_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  IntColumn get attempts => integer().withDefault(const Constant(0))();
+  TextColumn get lastError => text().named('last_error').nullable()();
+  TextColumn get providerId => text().named('provider_id').nullable()();
+  IntColumn get priority => integer().withDefault(const Constant(0))();
+  BoolColumn get isUrgent =>
+      boolean().named('is_urgent').withDefault(const Constant(false))();
+  TextColumn get createdById => text().named('created_by_id').nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL',
+        'FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE SET NULL',
+      ];
+}
+
+@DataClassName('SmsApprovalRow')
+class SmsApprovalsTable extends Table {
+  @override
+  String get tableName => 'sms_approvals';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get messageId => text().named('message_id')();
+  TextColumn get ruleId => text().named('rule_id').nullable()();
+  TextColumn get bookingId => text().named('booking_id').nullable()();
+  TextColumn get requestedById =>
+      text().named('requested_by_id').nullable()();
+  TextColumn get scheduledAt =>
+      text().named('scheduled_at').map(const UtcDateTimeConverter())();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
+  TextColumn get approvedAt => text()
+      .named('approved_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get approvedById =>
+      text().named('approved_by_id').nullable()();
+  TextColumn get reason => text().nullable()();
+  TextColumn get idempotencyKey =>
+      text().named('idempotency_key').nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'FOREIGN KEY (message_id) REFERENCES sms_messages(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('NotificationRow')
+class NotificationsTable extends Table {
+  @override
+  String get tableName => 'notifications';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get userId => text().named('user_id').nullable()();
+  TextColumn get type => text()();
+  TextColumn get bookingId => text().named('booking_id').nullable()();
+  TextColumn get paymentId => text().named('payment_id').nullable()();
+  TextColumn get customerId => text().named('customer_id').nullable()();
+  IntColumn get priority => integer().withDefault(const Constant(3))();
+  TextColumn get tone => text().withDefault(const Constant('primary'))();
+  TextColumn get icon => text().withDefault(const Constant('fa-bell'))();
+  TextColumn get title => text()();
+  TextColumn get body => text().nullable()();
+  TextColumn get targetKind => text().named('target_kind').nullable()();
+  TextColumn get targetId => text().named('target_id').nullable()();
+  TextColumn get dedupeKey => text().named('dedupe_key').nullable()();
+  TextColumn get scheduledAt => text()
+      .named('scheduled_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  BoolColumn get isUrgent =>
+      boolean().named('is_urgent').withDefault(const Constant(false))();
+  TextColumn get actorId => text().named('actor_id').nullable()();
+  TextColumn get actorName => text().named('actor_name').nullable()();
+  TextColumn get readAt => text()
+      .named('read_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get resolvedAt => text()
+      .named('resolved_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get expiresAt => text()
+      .named('expires_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('NotificationJobRow')
+class NotificationJobsTable extends Table {
+  @override
+  String get tableName => 'notification_jobs';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get kind => text()();
+  TextColumn get payload => text().map(const JsonMapConverter())();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
+  TextColumn get scheduledAt =>
+      text().named('scheduled_at').map(const UtcDateTimeConverter())();
+  TextColumn get nextAttemptAt => text()
+      .named('next_attempt_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  IntColumn get attempts => integer().withDefault(const Constant(0))();
+  TextColumn get lastError => text().named('last_error').nullable()();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get completedAt => text()
+      .named('completed_at')
+      .nullable()
+      .map(const NullableUtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}

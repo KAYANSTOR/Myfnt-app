@@ -29,6 +29,12 @@ part 'app_database.g.dart';
     BookingPackageVersionsTable,
     BookingTypesTable,
     CalendarBlocksTable,
+    AlertRulesTable,
+    SmsTemplatesTable,
+    SmsMessagesTable,
+    SmsApprovalsTable,
+    NotificationsTable,
+    NotificationJobsTable,
   ],
   daos: [
     BookingsDao,
@@ -42,7 +48,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -78,6 +84,15 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(bookingTypesTable);
             await m.createTable(calendarBlocksTable);
             await m.createTable(paymentAuditTable);
+            await _createIndexes();
+          }
+          if (from < 4) {
+            await m.createTable(alertRulesTable);
+            await m.createTable(smsTemplatesTable);
+            await m.createTable(smsMessagesTable);
+            await m.createTable(smsApprovalsTable);
+            await m.createTable(notificationsTable);
+            await m.createTable(notificationJobsTable);
             await _createIndexes();
           }
         },
@@ -133,6 +148,24 @@ class AppDatabase extends _$AppDatabase {
           'ON calendar_blocks(company_id, block_date)',
       'CREATE INDEX IF NOT EXISTS idx_payment_audit_payment '
           'ON payment_audit(payment_id, happened_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_alert_rules_company_enabled '
+          'ON alert_rules(company_id, enabled)',
+      'CREATE INDEX IF NOT EXISTS idx_sms_templates_company_code '
+          'ON sms_templates(company_id, code)',
+      'CREATE INDEX IF NOT EXISTS idx_sms_messages_company_status '
+          'ON sms_messages(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_sms_messages_scheduled '
+          'ON sms_messages(company_id, scheduled_at)',
+      'CREATE INDEX IF NOT EXISTS idx_sms_messages_booking '
+          'ON sms_messages(booking_id)',
+      'CREATE INDEX IF NOT EXISTS idx_sms_approvals_status '
+          'ON sms_approvals(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_notifications_user_created '
+          'ON notifications(company_id, user_id, created_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_notifications_unread '
+          'ON notifications(company_id, read_at)',
+      'CREATE INDEX IF NOT EXISTS idx_notification_jobs_status_scheduled '
+          'ON notification_jobs(company_id, status, scheduled_at)',
     ];
     for (final sql in indexes) {
       await customStatement(sql);
