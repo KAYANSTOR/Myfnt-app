@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/presentation/add_booking_sheet.dart';
+import '../../bookings/presentation/booking_details_screen.dart';
+import '../../bookings/presentation/booking_edit_screen.dart';
 import '../../bookings/providers/booking_providers.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
@@ -185,7 +187,30 @@ class SelectedDayPanel extends ConsumerWidget {
                     OutlinedButton.icon(onPressed: () => showAddBookingSheet(context, selectedDay), icon: const Icon(Icons.add), label: const Text('إضافة حجز لهذا اليوم')),
                   ])
                 : Column(children: [
-                    for (final booking in items) _BookingDayTile(booking: booking),
+                    for (final booking in items)
+                      _BookingDayTile(
+                        booking: booking,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => BookingDetailsScreen(
+                              booking: booking,
+                              onEdit: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => BookingEditScreen(
+                                    booking: booking,
+                                    onSave: (updated) => ref
+                                        .read(bookingControllerProvider)
+                                        .updateBooking(updated),
+                                  ),
+                                ),
+                              ),
+                              onCancel: () => ref
+                                  .read(bookingControllerProvider)
+                                  .deleteBooking(booking.id),
+                            ),
+                          ),
+                        ),
+                      ),
                     OutlinedButton.icon(onPressed: () => showAddBookingSheet(context, selectedDay), icon: const Icon(Icons.add), label: const Text('إضافة حجز آخر')),
                   ]),
           ),
@@ -196,11 +221,13 @@ class SelectedDayPanel extends ConsumerWidget {
 }
 
 class _BookingDayTile extends StatelessWidget {
-  const _BookingDayTile({required this.booking});
+  const _BookingDayTile({required this.booking, required this.onTap});
   final Booking booking;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => ListTile(
+        onTap: onTap,
         dense: true,
         contentPadding: EdgeInsets.zero,
         leading: const CircleAvatar(backgroundColor: AppColors.primaryLight, child: Icon(Icons.event, color: AppColors.primaryDark, size: 19)),
