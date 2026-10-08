@@ -249,8 +249,7 @@ class _MyfntTabIconState extends State<_MyfntTabIcon>
                 tab.animationController?.forward(from: 0);
               }
             },
-            child: IgnorePointer(
-              child: Stack(
+            child: Stack(
                 alignment: AlignmentDirectional.center,
                 children: <Widget>[
                   ScaleTransition(
@@ -289,7 +288,6 @@ class _MyfntTabIconState extends State<_MyfntTabIcon>
                   ),
                 ],
               ),
-            ),
           ),
         ),
       ),
