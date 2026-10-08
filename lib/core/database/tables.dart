@@ -244,8 +244,8 @@ class BookingAuditTable extends Table {
   TextColumn get action => text()();
   TextColumn get changedFields => text().named('changed_fields').map(const JsonListConverter())();
   TextColumn get reason => text().nullable()();
-  TextColumn get beforeJson => text().named('before_json').map(const NullableJsonMapConverter())();
-  TextColumn get afterJson => text().named('after_json').map(const NullableJsonMapConverter())();
+  TextColumn get beforeJson => text().named('before_json').map(const NullableJsonMapConverter()).nullable()();
+  TextColumn get afterJson => text().named('after_json').map(const NullableJsonMapConverter()).nullable()();
   TextColumn get happenedAt => text().named('happened_at').map(const UtcDateTimeConverter())();
   TextColumn get source => text().withDefault(const Constant('offline_app'))();
 

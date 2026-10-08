@@ -61,8 +61,8 @@ class CompanyService {
               CompanySettingsTableCompanion.insert(
                 id: kLocalSettingsId,
                 companyId: kLocalCompanyId,
-                requiredFields: const Value({}),
-                reminderDays: const Value([10, 7, 3, 1, 0]),
+                requiredFields: const {},
+                reminderDays: const [10, 7, 3, 1, 0],
                 updatedAt: now,
               ),
             );

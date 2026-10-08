@@ -39,7 +39,7 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
     final now = DateTime.now().toUtc();
     return (update(outboxTable)..where((t) =>
             t.status.equals('sending') &
-            t.leaseUntil.isSmallerThanValue(now)))
+            t.leaseUntil.isSmallerThanValue(now.toIso8601String())))
         .write(
       OutboxTableCompanion(
         status: const Value('failed'),

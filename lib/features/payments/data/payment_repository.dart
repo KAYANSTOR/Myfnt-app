@@ -71,14 +71,14 @@ class PaymentRepository {
               status: const Value('posted'),
               bookingNoSnapshot: Value(booking?.bookingNo),
               customerNameSnapshot: Value(booking?.customerNameSnapshot),
-              searchText: Value(TextNormalizer.buildSearchText([
+              searchText: TextNormalizer.buildSearchText([
                 receiptNo,
                 reference,
                 memo,
                 tag,
                 booking?.bookingNo,
                 booking?.customerNameSnapshot,
-              ])),
+              ]),
               createdById: Value(_actorId),
               createdByName: Value(_actorName),
               createdAt: now,

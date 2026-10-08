@@ -98,7 +98,7 @@ class BookingRepository {
               currency: Value(currency),
               customerNameSnapshot: Value(customerName),
               customerPhoneSnapshot: Value(customerPhone),
-              searchText: Value(searchText),
+              searchText: searchText,
               createdById: Value(_actorId),
               createdByName: Value(_actorName),
               createdAt: now,
