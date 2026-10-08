@@ -6,6 +6,11 @@ import 'daos/bookings_dao.dart';
 import 'daos/customers_dao.dart';
 import 'daos/outbox_dao.dart';
 import 'daos/payments_dao.dart';
+import 'daos/packages_dao.dart';
+import 'daos/settings_dao.dart';
+import 'daos/special_days_dao.dart';
+import 'daos/alert_rules_dao.dart';
+import 'daos/message_numbers_dao.dart';
 import 'converters/json_converter.dart';
 import 'converters/utc_datetime_converter.dart';
 import 'converters/uuid_converter.dart';
@@ -63,6 +68,11 @@ part 'app_database.g.dart';
     CustomersDao,
     PaymentsDao,
     OutboxDao,
+    PackagesDao,
+    SettingsDao,
+    SpecialDaysDao,
+    AlertRulesDao,
+    MessageNumbersDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
