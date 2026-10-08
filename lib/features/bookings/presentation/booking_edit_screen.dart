@@ -535,7 +535,7 @@ class _RemainingPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final remaining = (total - paid).clamp(0, double.infinity);
+    final remaining = (total - paid).clamp(0, double.infinity).toDouble();
     final isPaid = remaining == 0 && total > 0;
     final color = isPaid ? AppColors.booked : AppColors.error;
 
