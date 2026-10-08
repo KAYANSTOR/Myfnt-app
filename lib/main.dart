@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/company/company_providers.dart';
+import 'core/features/feature_gate_providers.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/presentation/home_screen.dart';
 
@@ -38,10 +39,42 @@ class _BootstrapGate extends ConsumerWidget {
     return bootstrap.when(
       loading: () => const _SplashScreen(),
       error: (error, _) => _ErrorScreen(message: error.toString()),
-      data: (_) => const Directionality(
-        textDirection: TextDirection.rtl,
-        child: HomeScreen(),
-      ),
+      data: (_) => const _SeedGate(),
+    );
+  }
+}
+
+class _SeedGate extends ConsumerStatefulWidget {
+  const _SeedGate();
+
+  @override
+  ConsumerState<_SeedGate> createState() => _SeedGateState();
+}
+
+class _SeedGateState extends ConsumerState<_SeedGate> {
+  bool _seeded = false;
+  Object? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      try {
+        await ref.read(featureGateServiceProvider).ensureSeeded();
+        if (mounted) setState(() => _seeded = true);
+      } catch (error) {
+        if (mounted) setState(() => _error = error);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) return _ErrorScreen(message: _error.toString());
+    if (!_seeded) return const _SplashScreen();
+    return const Directionality(
+      textDirection: TextDirection.rtl,
+      child: HomeScreen(),
     );
   }
 }
