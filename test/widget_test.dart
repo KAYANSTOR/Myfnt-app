@@ -9,7 +9,6 @@ import 'package:myfnt/features/bookings/domain/booking.dart';
 import 'package:myfnt/features/bookings/providers/booking_providers.dart';
 import 'package:myfnt/main.dart';
 
-/// ينشئ ProviderScope بـ DB في الذاكرة للاختبارات
 Widget _testApp(AppDatabase db) {
   return ProviderScope(
     overrides: [
@@ -39,7 +38,7 @@ void main() {
 
     expect(find.text('Myfnt'), findsOneWidget);
     expect(find.text('الحجوزات'), findsWidgets);
-    expect(find.text('التقويم'), findsOneWidget);
+    expect(find.byIcon(Icons.calendar_month_outlined), findsOneWidget);
   });
 
   testWidgets('ينتقل بين أقسام التطبيق', (tester) async {
@@ -52,7 +51,7 @@ void main() {
     await tester.pumpWidget(_testApp(db));
     await tester.pump();
 
-    await tester.tap(find.text('الحجوزات').last);
+    await tester.tap(find.byIcon(Icons.event_note_outlined));
     await tester.pumpAndSettle();
 
     expect(find.text('تابع كل حجوزاتك في مكان واحد'), findsOneWidget);
