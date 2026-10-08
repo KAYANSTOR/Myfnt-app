@@ -32,13 +32,20 @@ class _SelectedMonth extends Notifier<DateTime> {
     final now = DateTime.now();
     state = DateTime(now.year, now.month);
   }
+
+  void goToDate(DateTime date) {
+    state = DateTime(date.year, date.month);
+  }
 }
 
 final selectedMonthProvider = NotifierProvider<_SelectedMonth, DateTime>(
   _SelectedMonth.new,
 );
 
-final selectedDayProvider = StateProvider<DateTime?>((ref) => null);
+final selectedDayProvider = StateProvider<DateTime?>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+});
 
 final monthBookingsProvider = StreamProvider<List<Booking>>((ref) {
   final month = ref.watch(selectedMonthProvider);

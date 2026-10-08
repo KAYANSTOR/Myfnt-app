@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../bookings/presentation/add_booking_sheet.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/providers/booking_providers.dart';
 import 'calendar_day.dart';
@@ -227,6 +228,7 @@ class _CalendarGridState extends ConsumerState<CalendarGrid>
             onTap: () {
               ref.read(selectedDayProvider.notifier).state = date;
             },
+            onLongPress: () => showAddBookingSheet(context, date),
           );
         }
 

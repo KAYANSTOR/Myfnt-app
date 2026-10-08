@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../bookings/domain/booking.dart';
 import '../../bookings/presentation/add_booking_sheet.dart';
+import '../../bookings/providers/booking_providers.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/calendar_grid.dart';
 import '../widgets/home_header.dart';
@@ -71,6 +73,13 @@ class _CalendarTab extends ConsumerWidget {
 
           const SizedBox(height: 8),
 
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: SelectedDayPanel(),
+          ),
+
+          const SizedBox(height: 8),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -131,6 +140,73 @@ class _CalendarTab extends ConsumerWidget {
       ),
     );
   }
+}
+
+class SelectedDayPanel extends ConsumerWidget {
+  const SelectedDayPanel({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedDay = ref.watch(selectedDayProvider);
+    if (selectedDay == null) return const SizedBox.shrink();
+    final bookings = ref.watch(selectedDayBookingsProvider);
+
+    void moveDay(int offset) {
+      final next = selectedDay.add(Duration(days: offset));
+      final date = DateTime(next.year, next.month, next.day);
+      ref.read(selectedDayProvider.notifier).state = date;
+      ref.read(selectedMonthProvider.notifier).goToDate(date);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.available),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              IconButton(tooltip: 'اليوم السابق', onPressed: () => moveDay(-1), icon: const Icon(Icons.chevron_right)),
+              Expanded(child: Text('حجوزات ${selectedDay.year}/${selectedDay.month}/${selectedDay.day}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.textDark))),
+              IconButton(tooltip: 'اليوم التالي', onPressed: () => moveDay(1), icon: const Icon(Icons.chevron_left)),
+            ],
+          ),
+          const Divider(height: 8),
+          bookings.when(
+            loading: () => const Padding(padding: EdgeInsets.all(12), child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+            error: (_, __) => const Padding(padding: EdgeInsets.all(12), child: Text('تعذر تحميل حجوزات هذا اليوم', textAlign: TextAlign.center)),
+            data: (items) => items.isEmpty
+                ? Column(children: [
+                    const Padding(padding: EdgeInsets.all(8), child: Text('لا توجد حجوزات لهذا اليوم', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textMid))),
+                    OutlinedButton.icon(onPressed: () => showAddBookingSheet(context, selectedDay), icon: const Icon(Icons.add), label: const Text('إضافة حجز لهذا اليوم')),
+                  ])
+                : Column(children: [
+                    for (final booking in items) _BookingDayTile(booking: booking),
+                    OutlinedButton.icon(onPressed: () => showAddBookingSheet(context, selectedDay), icon: const Icon(Icons.add), label: const Text('إضافة حجز آخر')),
+                  ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookingDayTile extends StatelessWidget {
+  const _BookingDayTile({required this.booking});
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        leading: const CircleAvatar(backgroundColor: AppColors.primaryLight, child: Icon(Icons.event, color: AppColors.primaryDark, size: 19)),
+        title: Text(booking.customerName, style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text('${booking.status.label} · ${booking.amountRemaining.toStringAsFixed(0)} ${booking.currency} متبقي'),
+      );
 }
 
 class _FilterChip extends StatelessWidget {

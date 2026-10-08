@@ -12,6 +12,7 @@ class CalendarDay extends StatelessWidget {
     required this.isCurrentMonth,
     required this.bookings,
     required this.onTap,
+    this.onLongPress,
   });
 
   final int day;
@@ -19,6 +20,7 @@ class CalendarDay extends StatelessWidget {
   final bool isCurrentMonth;
   final List<Booking> bookings;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +28,8 @@ class CalendarDay extends StatelessWidget {
 
     return GestureDetector(
       onTap: isCurrentMonth ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      onLongPress: isCurrentMonth ? onLongPress : null,
+      child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
