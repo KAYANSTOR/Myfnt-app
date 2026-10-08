@@ -30,7 +30,7 @@ class CalendarGrid extends ConsumerWidget {
         borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textDark.withOpacity(.06),
+            color: AppColors.textDark.withValues(alpha: .06),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),

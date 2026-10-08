@@ -28,7 +28,7 @@ class CalendarDay extends StatelessWidget {
         ? AppColors.primary
         : status == _DayStatus.available
             ? AppColors.surface
-            : AppColors.primaryLight.withOpacity(.72);
+            : AppColors.primaryLight.withValues(alpha: .72);
     final foreground = isActive ? Colors.white : _fgColor(status);
 
     return Semantics(
@@ -47,7 +47,7 @@ class CalendarDay extends StatelessWidget {
                 ? Border.all(color: AppColors.primary, width: 2)
                 : null,
             boxShadow: isToday
-                ? [BoxShadow(color: AppColors.primary.withOpacity(.28), blurRadius: 9, offset: const Offset(0, 4))]
+                ? [BoxShadow(color: AppColors.primary.withValues(alpha: .28), blurRadius: 9, offset: const Offset(0, 4))]
                 : null,
           ),
           padding: const EdgeInsets.symmetric(vertical: 5),
@@ -62,7 +62,7 @@ class CalendarDay extends StatelessWidget {
               if (bookings.isNotEmpty)
                 Text(
                   '${bookings.length}',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: foreground.withOpacity(.78)),
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: foreground.withValues(alpha: .78)),
                 )
               else
                 Container(

@@ -94,7 +94,7 @@ class _MiventBottomNavigationState extends State<MiventBottomNavigation>
               child: PhysicalShape(
                 color: AppColors.card,
                 elevation: 16,
-                shadowColor: AppColors.primary.withOpacity(.20),
+                shadowColor: AppColors.primary.withValues(alpha: .20),
                 clipper: _MiventTabClipper(
                   radius: Tween<double>(begin: 0, end: 1)
                           .animate(CurvedAnimation(
@@ -166,7 +166,7 @@ class _MiventBottomNavigationState extends State<MiventBottomNavigation>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(.4),
+                          color: AppColors.primary.withValues(alpha: .4),
                           offset: const Offset(8, 16),
                           blurRadius: 16,
                         ),
@@ -176,9 +176,9 @@ class _MiventBottomNavigationState extends State<MiventBottomNavigation>
                       color: Colors.transparent,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(40),
-                        splashColor: Colors.white.withOpacity(.12),
+                        splashColor: Colors.white.withValues(alpha: .12),
                         onTap: widget.onAddPressed,
-                        child: const Semantics(
+                        child: Semantics(
                           label: 'إضافة حجز جديد',
                           button: true,
                           child: Icon(Icons.add, color: Colors.white, size: 32),
