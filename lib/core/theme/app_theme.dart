@@ -18,6 +18,14 @@ abstract final class AppColors {
   static const available = Color(0xFFE7E2DC);
 
   static const error = Color(0xFFC65D5D);
+  // Semantic aliases used by the booking form components.
+  static const background = surface;
+  static const text = textDark;
+  static const muted = textMid;
+  static const border = available;
+  static const success = booked;
+  static const warning = partial;
+  static const info = Color(0xFF647488);
 }
 
 /// ثيم التطبيق الرئيسي
