@@ -45,6 +45,6 @@ jobs:
       - name: Upload release APKs
         uses: actions/upload-artifact@v4
         with:
-          name: mivent-release-apks
+          name: myfnt-release-apks
           path: build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
