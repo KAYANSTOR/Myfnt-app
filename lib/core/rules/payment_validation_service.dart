@@ -1,5 +1,5 @@
 import '../../features/settings/data/settings_repository.dart';
-import '../database/tables.dart';
+import '../database/app_database.dart';
 import 'models/validation_result.dart';
 
 class PaymentValidationService {

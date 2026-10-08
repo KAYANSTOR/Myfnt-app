@@ -1,4 +1,4 @@
-import '../../database/tables.dart';
+import '../../database/app_database.dart';
 
 /// نتيجة حساب السعر والعربون لباقة في تاريخ معين.
 class PackageFinancials {

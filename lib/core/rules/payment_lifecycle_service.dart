@@ -1,4 +1,4 @@
-import '../database/tables.dart';
+import '../database/app_database.dart';
 
 class PaymentLifecycleService {
   const PaymentLifecycleService();

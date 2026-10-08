@@ -1,5 +1,5 @@
 import '../../features/settings/data/settings_repository.dart';
-import '../database/tables.dart';
+import '../database/app_database.dart';
 import 'models/package_financials.dart';
 
 class SeasonPricingService {
@@ -12,7 +12,7 @@ class SeasonPricingService {
     if (settings == null || !settings.seasonEnabled) return false;
     final start = settings.seasonStartMmdd;
     final end = settings.seasonEndMmdd;
-    if (start == null || end == null || !_isValidMmDd(start) || !_isValidMmDd(end)) {
+    if (!_isValidMmDd(start) || !_isValidMmDd(end)) {
       return false;
     }
     final mmdd = _formatMmDd(date);
