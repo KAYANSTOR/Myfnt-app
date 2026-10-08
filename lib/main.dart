@@ -52,7 +52,6 @@ class _SeedGate extends ConsumerStatefulWidget {
 }
 
 class _SeedGateState extends ConsumerState<_SeedGate> {
-  bool _seeded = false;
   Object? _error;
 
   @override
@@ -61,7 +60,7 @@ class _SeedGateState extends ConsumerState<_SeedGate> {
     Future.microtask(() async {
       try {
         await ref.read(featureGateServiceProvider).ensureSeeded();
-        if (mounted) setState(() => _seeded = true);
+        // يعمل الزرع في الخلفية؛ خدمة Feature Gate جاهزة للاستخدام بعد الإقلاع.
       } catch (error) {
         if (mounted) setState(() => _error = error);
       }
@@ -71,7 +70,6 @@ class _SeedGateState extends ConsumerState<_SeedGate> {
   @override
   Widget build(BuildContext context) {
     if (_error != null) return _ErrorScreen(message: _error.toString());
-    if (!_seeded) return const _SplashScreen();
     return const Directionality(
       textDirection: TextDirection.rtl,
       child: HomeScreen(),
