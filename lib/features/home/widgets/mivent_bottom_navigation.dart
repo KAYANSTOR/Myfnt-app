@@ -232,13 +232,7 @@ class _MiventTabIconState extends State<_MiventTabIcon>
     widget.tab.animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          if (!mounted) return;
-          widget.onTap();
-          widget.tab.animationController?.reverse();
-        }
-      });
+    );
   }
 
   @override
@@ -254,10 +248,10 @@ class _MiventTabIconState extends State<_MiventTabIcon>
           child: InkWell(
             splashColor: Colors.transparent,
             onTap: () {
+              // تغيير الصفحة فوراً؛ الحركة البصرية لا تؤخر التنقل.
+              widget.onTap();
               if (!tab.isSelected) {
                 tab.animationController?.forward();
-              } else {
-                widget.onTap();
               }
             },
             child: IgnorePointer(
