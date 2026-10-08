@@ -38,7 +38,7 @@ void main() {
 
     expect(find.text('Myfnt'), findsOneWidget);
     expect(find.text('الحجوزات'), findsWidgets);
-    expect(find.byIcon(Icons.calendar_month_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.calendar_month), findsOneWidget);
   });
 
   testWidgets('ينتقل بين أقسام التطبيق', (tester) async {
