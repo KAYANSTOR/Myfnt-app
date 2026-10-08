@@ -83,9 +83,11 @@ class _MiventBottomNavigationState extends State<MiventBottomNavigation>
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
-    return Stack(
-      alignment: AlignmentDirectional.bottomCenter,
-      children: <Widget>[
+    return SizedBox(
+      height: 92 + bottomInset,
+      child: Stack(
+        alignment: AlignmentDirectional.bottomCenter,
+        children: <Widget>[
         AnimatedBuilder(
           animation: _animationController,
           builder: (context, child) {
@@ -191,7 +193,8 @@ class _MiventBottomNavigationState extends State<MiventBottomNavigation>
             ),
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 
