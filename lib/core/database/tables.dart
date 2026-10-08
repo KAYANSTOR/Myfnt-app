@@ -287,3 +287,162 @@ class OutboxTable extends Table {
   @override
   Set<Column> get primaryKey => {seq};
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase 5 — الكتالوج والتدقيق المالي
+// ═══════════════════════════════════════════════════════════════════
+
+@DataClassName('BookingPackageRow')
+class BookingPackagesTable extends Table {
+  @override
+  String get tableName => 'booking_packages';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get name => text().withLength(min: 1, max: 100)();
+  TextColumn get icon => text().nullable()();
+  TextColumn get description => text().nullable()();
+  IntColumn get regularPriceMinor =>
+      integer().named('regular_price_minor').withDefault(const Constant(0))();
+  IntColumn get seasonPriceMinor =>
+      integer().named('season_price_minor').withDefault(const Constant(0))();
+  IntColumn get defaultDepositMinor =>
+      integer().named('default_deposit_minor').withDefault(const Constant(0))();
+  TextColumn get currency => text().withDefault(const Constant('YER'))();
+  BoolColumn get allowDoubleBooking => boolean()
+      .named('allow_double_booking')
+      .withDefault(const Constant(false))();
+  BoolColumn get allowDiscount =>
+      boolean().named('allow_discount').withDefault(const Constant(true))();
+  BoolColumn get builtInLocal =>
+      boolean().named('built_in_local').withDefault(const Constant(false))();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  IntColumn get packageVersion =>
+      integer().named('package_version').withDefault(const Constant(1))();
+  IntColumn get sortOrder =>
+      integer().named('sort_order').withDefault(const Constant(0))();
+  IntColumn get serverVersion =>
+      integer().named('server_version').withDefault(const Constant(0))();
+  BoolColumn get serverAdopted =>
+      boolean().named('server_adopted').withDefault(const Constant(false))();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'UNIQUE(company_id, name)',
+      ];
+}
+
+@DataClassName('BookingPackageVersionRow')
+class BookingPackageVersionsTable extends Table {
+  @override
+  String get tableName => 'booking_package_versions';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get packageId => text().named('package_id')();
+  IntColumn get version => integer()();
+  TextColumn get snapshot => text().map(const JsonMapConverter())();
+  TextColumn get reason => text().nullable()();
+  TextColumn get effectiveFrom =>
+      text().named('effective_from').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (package_id) REFERENCES booking_packages(id) ON DELETE CASCADE',
+        'UNIQUE(package_id, version)',
+      ];
+}
+
+@DataClassName('BookingTypeRow')
+class BookingTypesTable extends Table {
+  @override
+  String get tableName => 'booking_types';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get companyId => text().named('company_id').nullable()();
+  TextColumn get code => text()();
+  TextColumn get nameAr => text().named('name_ar')();
+  TextColumn get nameEn => text().named('name_en').nullable()();
+  TextColumn get colorHex => text().named('color_hex').nullable()();
+  TextColumn get icon => text().nullable()();
+  BoolColumn get isDefault =>
+      boolean().named('is_default').withDefault(const Constant(false))();
+  BoolColumn get active =>
+      boolean().withDefault(const Constant(true))();
+  IntColumn get sortOrder =>
+      integer().named('sort_order').withDefault(const Constant(0))();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => ['UNIQUE(company_id, code)'];
+}
+
+@DataClassName('CalendarBlockRow')
+class CalendarBlocksTable extends Table {
+  @override
+  String get tableName => 'calendar_blocks';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get blockKind => text().named('block_kind')();
+  TextColumn get blockDate => text().named('block_date').nullable()();
+  TextColumn get startDate => text().named('start_date').nullable()();
+  TextColumn get endDate => text().named('end_date').nullable()();
+  TextColumn get weekdays => text()
+      .named('weekdays')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get title => text()();
+  TextColumn get notes => text().nullable()();
+  TextColumn get colorHex => text().named('color_hex').nullable()();
+  IntColumn get serverVersion =>
+      integer().named('server_version').withDefault(const Constant(0))();
+  TextColumn get createdAt =>
+      text().named('created_at').map(const UtcDateTimeConverter())();
+  TextColumn get updatedAt =>
+      text().named('updated_at').map(const UtcDateTimeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+      ];
+}
+
+@DataClassName('PaymentAuditRow')
+class PaymentAuditTable extends Table {
+  @override
+  String get tableName => 'payment_audit';
+  TextColumn get id => text().map(const UuidConverter())();
+  TextColumn get legacyId => text().named('legacy_id').nullable()();
+  TextColumn get companyId => text().named('company_id')();
+  TextColumn get paymentId => text().named('payment_id')();
+  TextColumn get action => text()();
+  TextColumn get reason => text().nullable()();
+  TextColumn get beforeJson => text()
+      .named('before_json')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get afterJson => text()
+      .named('after_json')
+      .nullable()
+      .map(const NullableJsonMapConverter())();
+  TextColumn get actorId => text().named('actor_id').nullable()();
+  TextColumn get actorName => text().named('actor_name').nullable()();
+  TextColumn get happenedAt =>
+      text().named('happened_at').map(const UtcDateTimeConverter())();
+  TextColumn get source =>
+      text().withDefault(const Constant('offline_app'))();
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  List<String> get customConstraints => [
+        'FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE',
+        'FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE',
+      ];
+}

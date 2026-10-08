@@ -23,7 +23,12 @@ part 'app_database.g.dart';
     BookingDetailsTable,
     PaymentsTable,
     BookingAuditTable,
+    PaymentAuditTable,
     OutboxTable,
+    BookingPackagesTable,
+    BookingPackageVersionsTable,
+    BookingTypesTable,
+    CalendarBlocksTable,
   ],
   daos: [
     BookingsDao,
@@ -37,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +69,15 @@ class AppDatabase extends _$AppDatabase {
             }
             await customStatement('PRAGMA foreign_keys = ON');
             await m.createAll();
+            await _createIndexes();
+            return;
+          }
+          if (from < 3) {
+            await m.createTable(bookingPackagesTable);
+            await m.createTable(bookingPackageVersionsTable);
+            await m.createTable(bookingTypesTable);
+            await m.createTable(calendarBlocksTable);
+            await m.createTable(paymentAuditTable);
             await _createIndexes();
           }
         },
@@ -107,6 +121,18 @@ class AppDatabase extends _$AppDatabase {
           'ON outbox(company_id, status, created_at ASC)',
       'CREATE INDEX IF NOT EXISTS idx_outbox_entity_key '
           'ON outbox(entity_key)',
+      'CREATE INDEX IF NOT EXISTS idx_packages_company_status '
+          'ON booking_packages(company_id, status)',
+      'CREATE INDEX IF NOT EXISTS idx_packages_company_sort '
+          'ON booking_packages(company_id, sort_order)',
+      'CREATE INDEX IF NOT EXISTS idx_package_versions_package '
+          'ON booking_package_versions(package_id, version DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_booking_types_company '
+          'ON booking_types(company_id, code)',
+      'CREATE INDEX IF NOT EXISTS idx_calendar_blocks_company_date '
+          'ON calendar_blocks(company_id, block_date)',
+      'CREATE INDEX IF NOT EXISTS idx_payment_audit_payment '
+          'ON payment_audit(payment_id, happened_at DESC)',
     ];
     for (final sql in indexes) {
       await customStatement(sql);
