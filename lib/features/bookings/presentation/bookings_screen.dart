@@ -6,7 +6,6 @@ import '../domain/booking.dart';
 import '../providers/booking_providers.dart';
 import '../providers/bookings_list_providers.dart';
 import 'add_booking_sheet.dart';
-import 'booking_cancel_dialog.dart';
 import 'booking_details_screen.dart';
 import 'booking_edit_screen.dart';
 
@@ -58,36 +57,35 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
     if (updated != null && mounted) {
       Navigator.of(context).pop();
-      _showSnack('تم حفظ التعديلات');
     }
   }
 
   Future<void> _cancelBooking(Booking booking) async {
-    final shouldCancel = await showBookingCancelDialog(context);
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إلغاء الحجز؟'),
+        content: const Text('سيتم تغيير حالة الحجز إلى ملغى.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('تراجع'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('إلغاء الحجز'),
+          ),
+        ],
+      ),
+    );
 
     if (shouldCancel != true || !mounted) return;
 
-    try {
-      await ref.read(bookingControllerProvider).updateBooking(
-            booking.copyWith(status: BookingStatus.cancelled),
-          );
+    await ref.read(bookingControllerProvider).updateBooking(
+          booking.copyWith(status: BookingStatus.cancelled),
+        );
 
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      _showSnack('تم إلغاء الحجز');
-    } catch (_) {
-      if (mounted) _showSnack('تعذّر إلغاء الحجز', isError: true);
-    }
-  }
-
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.textDark,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    if (mounted) Navigator.of(context).pop();
   }
 
   @override
